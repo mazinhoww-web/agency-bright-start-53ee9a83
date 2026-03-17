@@ -101,7 +101,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="//economia.awesomeapi.com.br" />
         <link rel="dns-prefetch" href="//api.z-api.io" />
       </head>
-      <body className={`${geist.className} antialiased`}>{children}</body>
+      <body className={`${geist.className} antialiased`}>
+        {/* Skip-to-content — WCAG 2.4.1 */}
+        <a href="#main-content" className="skip-to-content">
+          Ir para o conteúdo principal
+        </a>
+        <div id="main-content">{children}</div>
+      </body>
     </html>
   )
 }

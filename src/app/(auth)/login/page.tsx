@@ -71,7 +71,7 @@ export default function LoginPage() {
                 Não recebeu?{' '}
                 <button
                   onClick={() => setSent(false)}
-                  className="text-blue-700 font-semibold hover:underline"
+                  className="text-blue-700 font-semibold hover:underline min-h-[44px] px-1"
                 >
                   Reenviar
                 </button>

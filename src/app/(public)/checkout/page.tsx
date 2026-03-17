@@ -8,8 +8,26 @@ import { formatCurrencyFromCents } from '@/utils/currency'
 import type { PackageId } from '@/config/packages'
 
 const PAYMENT_METHODS = [
-  { id: 'card', label: 'Cartão de crédito', icon: '💳', description: 'Visa, Mastercard, Elo, Amex' },
-  { id: 'pix', label: 'PIX', icon: '⚡', description: 'Aprovação imediata' },
+  {
+    id: 'card',
+    label: 'Cartão de crédito',
+    description: 'Visa, Mastercard, Elo, Amex',
+    icon: (
+      <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'pix',
+    label: 'PIX',
+    description: 'Aprovação imediata',
+    icon: (
+      <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+  },
 ]
 
 export default function CheckoutPage() {
@@ -154,7 +172,7 @@ export default function CheckoutPage() {
                         onChange={() => setPaymentMethod(m.id as 'card' | 'pix')}
                         className="accent-blue-700"
                       />
-                      <span className="text-2xl">{m.icon}</span>
+                      {m.icon}
                       <div>
                         <p className="font-semibold text-slate-900 text-sm">{m.label}</p>
                         <p className="text-xs text-slate-500">{m.description}</p>

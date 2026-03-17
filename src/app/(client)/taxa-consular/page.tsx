@@ -95,12 +95,30 @@ export default function TaxaConsularPage() {
           <p className="text-sm font-semibold text-slate-700 mb-3">Forma de pagamento</p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { id: 'pix' as const, label: 'PIX', icon: '⚡', markup: '+ 15%' },
-              { id: 'card' as const, label: 'Cartão', icon: '💳', markup: '+ 10%' },
+              {
+                id: 'pix' as const,
+                label: 'PIX',
+                markup: '+ 15%',
+                icon: (
+                  <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                ),
+              },
+              {
+                id: 'card' as const,
+                label: 'Cartão',
+                markup: '+ 10%',
+                icon: (
+                  <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                ),
+              },
             ].map((m) => (
               <label
                 key={m.id}
-                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-colors min-h-[60px] ${
                   paymentMethod === m.id
                     ? 'border-blue-700 bg-blue-50'
                     : 'border-slate-200 hover:border-blue-300'
@@ -114,7 +132,7 @@ export default function TaxaConsularPage() {
                   onChange={() => setPaymentMethod(m.id)}
                   className="accent-blue-700"
                 />
-                <span className="text-xl">{m.icon}</span>
+                {m.icon}
                 <div>
                   <p className="font-semibold text-sm text-slate-900">{m.label}</p>
                   <p className="text-xs text-slate-500">Spread {m.markup}</p>

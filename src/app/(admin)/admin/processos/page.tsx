@@ -147,7 +147,7 @@ export default function ProcessosPage() {
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/processos/${p.id}`}
-                        className="text-sm text-blue-700 font-semibold hover:underline mr-3"
+                        className="text-sm text-blue-700 font-semibold hover:underline mr-3 min-h-[44px] inline-flex items-center"
                       >
                         Gerenciar
                       </Link>

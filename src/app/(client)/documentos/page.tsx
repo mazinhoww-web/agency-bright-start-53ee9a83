@@ -39,7 +39,11 @@ export default function DocumentosPage() {
 
       {docs.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
-          <div className="text-5xl mb-4">📭</div>
+          <div className="flex justify-center mb-4" aria-hidden="true">
+            <svg className="w-12 h-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
           <h2 className="text-xl font-bold text-slate-900 mb-2">Nenhum documento disponível</h2>
           <p className="text-slate-600">Assim que sua consultora preparar os documentos, eles aparecerão aqui.</p>
         </div>
@@ -48,7 +52,7 @@ export default function DocumentosPage() {
           {docs.map((doc) => (
             <div
               key={doc.id}
-              className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4 hover:border-blue-300 hover:shadow-sm transition-all"
+              className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4 hover:border-blue-300 hover:shadow-sm transition-colors"
             >
               <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -61,7 +65,7 @@ export default function DocumentosPage() {
                   {formatFileSize(doc.size)} • Disponível em {formatDate(doc.created_at)}
                 </p>
               </div>
-              <button className="flex-shrink-0 flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors">
+              <button className="flex-shrink-0 flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-3 rounded-lg transition-colors min-h-[44px]">
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
