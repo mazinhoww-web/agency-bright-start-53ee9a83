@@ -40,8 +40,36 @@ function CheckoutPageInner() {
   const [step, setStep] = useState<1 | 2>(1)
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', cpf: '' })
   const [loading, setLoading] = useState(false)
+  const [couponCode, setCouponCode] = useState('')
+  const [couponResult, setCouponResult] = useState<{ valid: boolean; discount_in_cents: number; final_amount_in_cents: number; coupon: { id: string; code: string; discount_type: string; discount_value: number; influencer_name: string | null } } | null>(null)
+  const [couponError, setCouponError] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
 
   const pkg = PACKAGES[selectedPackage]
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return
+    setCouponLoading(true)
+    setCouponError('')
+    setCouponResult(null)
+
+    const res = await fetch('/api/coupons/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: couponCode, amountInCents: pkg.priceInCents }),
+    })
+    const data = await res.json()
+    setCouponLoading(false)
+
+    if (!res.ok) {
+      setCouponError(data.error || 'Cupom inválido')
+      return
+    }
+
+    setCouponResult(data)
+  }
+
+  const finalPriceInCents = couponResult ? couponResult.final_amount_in_cents : pkg.priceInCents
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -242,6 +270,45 @@ function CheckoutPageInner() {
                   </div>
                 </div>
 
+                {/* Cupom de desconto */}
+                <div className="mb-8">
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Cupom de desconto</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponResult(null); setCouponError('') }}
+                      placeholder="EX: PROMO10"
+                      className="flex-1 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 uppercase"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={couponLoading || !couponCode.trim()}
+                      className="border-2 border-blue-700 text-blue-700 font-semibold px-5 py-3 rounded-xl hover:bg-blue-50 disabled:opacity-50 transition-colors text-sm"
+                    >
+                      {couponLoading ? '...' : 'Aplicar'}
+                    </button>
+                  </div>
+                  {couponError && (
+                    <p className="text-sm text-red-600 mt-2">{couponError}</p>
+                  )}
+                  {couponResult && (
+                    <div className="mt-2 flex items-center gap-2 text-sm text-green-700 bg-green-50 px-4 py-2.5 rounded-xl border border-green-200">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>
+                        Cupom <strong>{couponResult.coupon.code}</strong> aplicado!
+                        {couponResult.coupon.discount_type === 'percentage'
+                          ? ` ${couponResult.coupon.discount_value}% de desconto`
+                          : ` R$ ${(couponResult.discount_in_cents / 100).toFixed(2)} de desconto`}
+                        {couponResult.coupon.influencer_name && ` · Indicação de ${couponResult.coupon.influencer_name}`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex gap-4">
                   <button
                     type="button"
@@ -255,7 +322,7 @@ function CheckoutPageInner() {
                     disabled={loading}
                     className="flex-1 bg-blue-700 hover:bg-blue-800 disabled:opacity-70 text-white font-bold py-4 px-8 rounded-xl transition-colors"
                   >
-                    {loading ? 'Processando...' : `Pagar ${formatCurrencyFromCents(pkg.priceInCents)}`}
+                    {loading ? 'Processando...' : `Pagar ${formatCurrencyFromCents(finalPriceInCents)}`}
                   </button>
                 </div>
               </form>
@@ -288,13 +355,19 @@ function CheckoutPageInner() {
                   <span>Assessoria</span>
                   <span>{formatCurrencyFromCents(pkg.priceInCents)}</span>
                 </div>
+                {couponResult && (
+                  <div className="flex justify-between text-sm text-green-700">
+                    <span>Desconto ({couponResult.coupon.code})</span>
+                    <span>- {formatCurrencyFromCents(couponResult.discount_in_cents)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm text-slate-500 italic">
                   <span>Taxa consular (separado)</span>
                   <span>US$ 185/pessoa</span>
                 </div>
                 <div className="flex justify-between font-bold text-slate-900 text-lg border-t pt-2">
                   <span>Total hoje</span>
-                  <span>{formatCurrencyFromCents(pkg.priceInCents)}</span>
+                  <span>{formatCurrencyFromCents(finalPriceInCents)}</span>
                 </div>
               </div>
               <div className="mt-6 flex items-center gap-2 text-xs text-slate-500 bg-slate-50 rounded-lg p-3">

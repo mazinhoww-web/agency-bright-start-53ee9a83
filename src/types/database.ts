@@ -8,6 +8,9 @@ export type ProcessStatus =
   | 'completed'
 
 export type LocationType = 'casv' | 'consulate'
+export type DiscountType = 'percentage' | 'fixed'
+export type SenderType = 'client' | 'admin'
+export type TemplateCategory = 'status_update' | 'appointment' | 'sales' | 'general' | 'existing_client'
 
 export type Database = {
   public: {
@@ -31,6 +34,8 @@ export type Database = {
           consulate_city: string | null
           consulate_intended_date: string | null
           appointment_disclaimer_accepted_at: string | null
+          coupon_id: string | null
+          discount_applied_brl: number | null
           created_at: string
           updated_at: string
         }
@@ -152,6 +157,78 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['admin_notes']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['admin_notes']['Insert']>
+      }
+      coupons: {
+        Row: {
+          id: string
+          code: string
+          discount_type: DiscountType
+          discount_value: number
+          influencer_name: string | null
+          influencer_email: string | null
+          max_uses: number | null
+          uses_count: number
+          total_revenue_generated: number
+          is_active: boolean
+          expires_at: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['coupons']['Row'], 'id' | 'created_at' | 'uses_count' | 'total_revenue_generated'>
+        Update: Partial<Database['public']['Tables']['coupons']['Insert']>
+      }
+      coupon_uses: {
+        Row: {
+          id: string
+          coupon_id: string
+          process_id: string
+          user_id: string
+          original_amount_brl: number
+          discount_applied_brl: number
+          final_amount_brl: number
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['coupon_uses']['Row'], 'id' | 'created_at'>
+        Update: Partial<Database['public']['Tables']['coupon_uses']['Insert']>
+      }
+      messages: {
+        Row: {
+          id: string
+          process_id: string
+          sender_id: string
+          sender_type: SenderType
+          content: string
+          is_read: boolean
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['messages']['Row'], 'id' | 'created_at'>
+        Update: Partial<Database['public']['Tables']['messages']['Insert']>
+      }
+      whatsapp_templates: {
+        Row: {
+          id: string
+          name: string
+          category: TemplateCategory
+          content: string
+          trigger_status: string | null
+          is_active: boolean
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['whatsapp_templates']['Row'], 'id' | 'created_at'>
+        Update: Partial<Database['public']['Tables']['whatsapp_templates']['Insert']>
+      }
+      whatsapp_inbound: {
+        Row: {
+          id: string
+          from_phone: string
+          from_name: string | null
+          message: string
+          is_read: boolean
+          process_id: string | null
+          z_api_data: Record<string, unknown> | null
+          received_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['whatsapp_inbound']['Row'], 'id' | 'received_at'>
+        Update: Partial<Database['public']['Tables']['whatsapp_inbound']['Insert']>
       }
     }
   }
