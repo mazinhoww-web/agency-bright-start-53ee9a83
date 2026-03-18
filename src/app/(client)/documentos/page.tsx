@@ -1,13 +1,17 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
-// Mock data — em produção vem do Supabase
-const mockDocuments = [
-  { id: '1', name: 'DS-160 — João Silva.pdf', size: 245760, mime_type: 'application/pdf', created_at: '2024-01-20T10:00:00Z' },
-  { id: '2', name: 'DS-160 — Maria Silva.pdf', size: 238592, mime_type: 'application/pdf', created_at: '2024-01-20T10:05:00Z' },
-  { id: '3', name: 'Comprovante taxa consular.pdf', size: 102400, mime_type: 'application/pdf', created_at: '2024-01-21T14:30:00Z' },
-]
+type Document = {
+  id: string
+  name: string
+  file_path: string
+  file_size: number
+  mime_type: string
+  created_at: string
+}
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -22,7 +26,61 @@ function formatDate(iso: string): string {
 }
 
 export default function DocumentosPage() {
-  const docs = mockDocuments
+  const [docs, setDocs] = useState<Document[]>([])
+  const [loading, setLoading] = useState(true)
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadDocuments = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        const { data: process } = await supabase
+          .from('processes')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (!process) return
+
+        const { data } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('process_id', process.id)
+          .order('created_at', { ascending: false })
+
+        if (data) setDocs(data as Document[])
+      } catch (err) {
+        console.error('Error loading documents:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadDocuments()
+  }, [])
+
+  const handleDownload = async (doc: Document) => {
+    setDownloadingId(doc.id)
+    try {
+      const supabase = createClient()
+      const { data } = await supabase.storage
+        .from('client-documents')
+        .createSignedUrl(doc.file_path, 3600)
+
+      if (data?.signedUrl) {
+        window.open(data.signedUrl, '_blank')
+      }
+    } catch (err) {
+      console.error('Error downloading document:', err)
+    } finally {
+      setDownloadingId(null)
+    }
+  }
 
   return (
     <div className="p-6 lg:p-10 max-w-3xl">
@@ -37,7 +95,12 @@ export default function DocumentosPage() {
         <p className="text-slate-600">Documentos preparados pela sua consultora.</p>
       </div>
 
-      {docs.length === 0 ? (
+      {loading ? (
+        <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
+          <div className="w-8 h-8 border-4 border-blue-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-slate-500">Carregando documentos...</p>
+        </div>
+      ) : docs.length === 0 ? (
         <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
           <div className="flex justify-center mb-4" aria-hidden="true">
             <svg className="w-12 h-12 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,13 +125,21 @@ export default function DocumentosPage() {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-slate-900 truncate">{doc.name}</p>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  {formatFileSize(doc.size)} • Disponível em {formatDate(doc.created_at)}
+                  {formatFileSize(doc.file_size)} • Disponível em {formatDate(doc.created_at)}
                 </p>
               </div>
-              <button className="flex-shrink-0 flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm font-semibold px-4 py-3 rounded-lg transition-colors min-h-[44px]">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+              <button
+                onClick={() => handleDownload(doc)}
+                disabled={downloadingId === doc.id}
+                className="flex-shrink-0 flex items-center gap-2 bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white text-sm font-semibold px-4 py-3 rounded-lg transition-colors min-h-[44px]"
+              >
+                {downloadingId === doc.id ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                )}
                 Baixar
               </button>
             </div>

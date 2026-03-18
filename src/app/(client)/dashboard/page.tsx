@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 type ProcessStatus =
   | 'pending_form'
@@ -34,18 +36,21 @@ const STEP_ORDER: ProcessStatus[] = [
   'appointment_requested', 'docs_in_preparation', 'docs_ready', 'completed'
 ]
 
-// Dados mock — em produção virão do Supabase
-const mockProcess = {
-  id: 'mock-id',
-  package: 'Pro+',
-  maxApplicants: 3,
-  status: 'consular_fee_paid' as ProcessStatus,
-  applicants: [
-    { id: '1', label: 'Solicitante Principal', given_name: 'João', surname: 'Silva', form_step: 8, form_completed_at: '2024-01-15' },
-    { id: '2', label: 'Cônjuge', given_name: 'Maria', surname: 'Silva', form_step: 3, form_completed_at: null },
-    { id: '3', label: 'Filho', given_name: null, surname: null, form_step: 0, form_completed_at: null },
-  ],
-  consulting_paid_at: '2024-01-10',
+type Applicant = {
+  id: string
+  label: string
+  given_name: string | null
+  surname: string | null
+  form_step: number
+  form_completed_at: string | null
+}
+
+type Process = {
+  id: string
+  package: string
+  max_applicants: number
+  status: ProcessStatus
+  applicants: Applicant[]
 }
 
 function getStepIndex(status: ProcessStatus): number {
@@ -53,7 +58,70 @@ function getStepIndex(status: ProcessStatus): number {
 }
 
 export default function DashboardPage() {
-  const process = mockProcess
+  const [process, setProcess] = useState<Process | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchProcess = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+        if (authError || !user) {
+          setError('Usuário não autenticado')
+          setLoading(false)
+          return
+        }
+
+        const { data, error: processError } = await supabase
+          .from('processes')
+          .select('*, applicants(*)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (processError || !data) {
+          setError('Nenhum processo encontrado')
+          setLoading(false)
+          return
+        }
+
+        setProcess(data as Process)
+      } catch (err) {
+        console.error('Error fetching process:', err)
+        setError('Erro ao carregar dados')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProcess()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="p-6 lg:p-10 flex items-center justify-center min-h-64">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-700 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-slate-500">Carregando seu processo...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error || !process) {
+    return (
+      <div className="p-6 lg:p-10">
+        <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center">
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Nenhum processo encontrado</h2>
+          <p className="text-slate-600">{error || 'Entre em contato com nossa consultora para iniciar seu processo.'}</p>
+        </div>
+      </div>
+    )
+  }
+
   const statusConfig = STATUS_CONFIG[process.status]
   const currentStepIndex = getStepIndex(process.status)
 
@@ -144,7 +212,7 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-bold text-slate-900">
-            Solicitantes ({process.applicants.length}/{process.maxApplicants})
+            Solicitantes ({process.applicants.length}/{process.max_applicants})
           </h2>
           <Link href="/formulario" className="text-sm text-blue-700 font-semibold hover:underline">
             Preencher formulários →
