@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { PACKAGES } from '@/config/packages'
@@ -30,7 +30,7 @@ const PAYMENT_METHODS = [
   },
 ]
 
-export default function CheckoutPage() {
+function CheckoutPageInner() {
   const searchParams = useSearchParams()
   const defaultPkg = (searchParams.get('package') as PackageId) || 'pro_plus'
   const [selectedPackage, setSelectedPackage] = useState<PackageId>(
@@ -308,5 +308,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense>
+      <CheckoutPageInner />
+    </Suspense>
   )
 }
