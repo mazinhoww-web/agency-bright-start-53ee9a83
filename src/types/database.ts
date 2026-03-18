@@ -11,6 +11,11 @@ export type LocationType = 'casv' | 'consulate'
 export type DiscountType = 'percentage' | 'fixed'
 export type SenderType = 'client' | 'admin'
 export type TemplateCategory = 'status_update' | 'appointment' | 'sales' | 'general' | 'existing_client'
+export type LeadStatus = 'new' | 'contacted' | 'nurturing' | 'hot' | 'converted' | 'lost'
+export type LeadSource = 'site' | 'instagram' | 'whatsapp' | 'referral' | 'google' | 'other'
+export type EmailTemplateCategory = 'transactional' | 'status_update' | 'lead_nurturing' | 'admin_notification' | 'lead_magnet'
+export type EmailLogStatus = 'sent' | 'delivered' | 'failed' | 'bounced'
+export type EmailQueueStatus = 'pending' | 'sent' | 'cancelled'
 
 export type Database = {
   public: {
@@ -247,6 +252,81 @@ export type Database = {
           z_api_data?: Record<string, unknown> | null
         }
         Update: Partial<Database['public']['Tables']['whatsapp_inbound']['Insert']>
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          id: string
+          name: string
+          email: string
+          phone: string | null
+          interested_package: string | null
+          source: LeadSource
+          status: LeadStatus
+          notes: string | null
+          converted_process_id: string | null
+          utm_source: string | null
+          utm_medium: string | null
+          utm_campaign: string | null
+          lead_score: number
+          last_contacted_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['leads']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Database['public']['Tables']['leads']['Insert']>
+        Relationships: []
+      }
+      email_templates: {
+        Row: {
+          id: string
+          key: string
+          name: string
+          category: EmailTemplateCategory
+          subject: string
+          body_html: string
+          body_text: string | null
+          variables: string[] | null
+          trigger_status: string | null
+          is_active: boolean
+          send_delay_hours: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['email_templates']['Row'], 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Database['public']['Tables']['email_templates']['Insert']>
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          id: string
+          to_email: string
+          to_name: string | null
+          subject: string
+          template_key: string | null
+          process_id: string | null
+          lead_id: string | null
+          resend_id: string | null
+          status: EmailLogStatus
+          error_message: string | null
+          sent_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['email_logs']['Row'], 'id' | 'sent_at'>
+        Update: Partial<Database['public']['Tables']['email_logs']['Insert']>
+        Relationships: []
+      }
+      lead_email_queue: {
+        Row: {
+          id: string
+          lead_id: string
+          template_key: string
+          scheduled_for: string
+          sent_at: string | null
+          cancelled_at: string | null
+          status: EmailQueueStatus
+        }
+        Insert: Omit<Database['public']['Tables']['lead_email_queue']['Row'], 'id'>
+        Update: Partial<Database['public']['Tables']['lead_email_queue']['Insert']>
         Relationships: []
       }
     }

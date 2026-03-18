@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import type { ProcessStatus } from '@/types/database'
+import { sendStatusEmail } from '@/lib/email/automations'
 
 export async function PATCH(
   req: NextRequest,
@@ -33,6 +34,9 @@ export async function PATCH(
       .eq('id', processId)
 
     if (updateError) throw updateError
+
+    // Enviar email automático para o cliente (sempre que mudar status)
+    sendStatusEmail(processId, status as ProcessStatus).catch(console.error)
 
     // Notificar via WhatsApp se solicitado
     if (notifyWhatsApp) {
