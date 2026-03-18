@@ -13,8 +13,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ paid: false, error: 'AbacatePay não configurado' }, { status: 500 })
     }
 
+    // Endpoint oficial: GET /v1/checkouts/get?id={billingId}
     const res = await fetch(
-      `https://api.abacatepay.com/v1/billing/getById?id=${encodeURIComponent(chargeId)}`,
+      `https://api.abacatepay.com/v1/checkouts/get?id=${encodeURIComponent(chargeId)}`,
       {
         headers: {
           Authorization: `Bearer ${process.env.ABACATEPAY_API_KEY}`,
@@ -27,16 +28,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ paid: false })
     }
 
-    const data = await res.json()
-    const billing = data?.data ?? data
+    const json = await res.json()
 
-    // O billing está pago se houver um charge com status PAID
-    const charges: Array<{ status?: string }> = billing?.charges ?? []
-    const paid =
-      charges.some((c) => c.status === 'PAID') ||
-      billing?.status === 'PAID'
+    // Resposta: { data: { status: 'PAID' | 'PENDING' | 'EXPIRED' | ... }, error: null }
+    const status: string = json?.data?.status ?? ''
+    const paid = status === 'PAID'
 
-    return NextResponse.json({ paid })
+    return NextResponse.json({ paid, status })
   } catch (error) {
     console.error('AbacatePay status check error:', error)
     return NextResponse.json({ paid: false })

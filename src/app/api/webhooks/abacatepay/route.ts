@@ -4,29 +4,50 @@ import { sendWelcomeEmails, sendStatusEmail } from '@/lib/email/automations'
 import { PACKAGES } from '@/config/packages'
 import type { PackageId } from '@/config/packages'
 
+// Payload oficial AbacatePay v2:
+// {
+//   "event": "checkout.completed",
+//   "apiVersion": 2,
+//   "devMode": false,
+//   "data": {
+//     "checkout": { "id", "status": "PAID", "amount", "metadata", "externalId", ... },
+//     "customer": { "name", "email", "taxId" },
+//     "payerInformation": { ... }
+//   }
+// }
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const { event, data } = body
 
-    // AbacatePay envia BILLING_PAID quando o PIX é confirmado
-    const isPaid =
+    // Aceitar tanto o evento v2 oficial quanto variações legadas
+    const isPaidEvent =
+      event === 'checkout.completed' ||
       event === 'BILLING_PAID' ||
-      event === 'billing.paid' ||
-      data?.status === 'PAID' ||
-      data?.billing?.status === 'PAID'
+      event === 'billing.paid'
 
-    if (!isPaid) {
+    if (!isPaidEvent) {
       return NextResponse.json({ received: true })
     }
 
-    // Normalizar estrutura de dados (pode vir em data ou data.billing)
-    const billing = data?.billing ?? data
-    const metadata = billing?.metadata ?? {}
-    const customer = billing?.customer ?? {}
-    const amountCents: number = billing?.amount ?? 0
+    // Normalizar estrutura: v2 usa data.checkout, v1 legacy usava data direto
+    const checkout = data?.checkout ?? data
+    const customer = data?.customer ?? {}
+
+    if (!checkout || checkout.status !== 'PAID') {
+      return NextResponse.json({ received: true })
+    }
+
+    const billingId: string = checkout.id ?? ''
+    const amountCents: number = checkout.paidAmount ?? checkout.amount ?? 0
     const amountBrl = amountCents / 100
-    const billingId: string = billing?.id ?? ''
+    const metadata: Record<string, string> = checkout.metadata ?? {}
+
+    // Dados do cliente: v2 vem em data.customer, fallback em checkout
+    const customerEmail: string = customer?.email ?? checkout?.email ?? ''
+    const customerName: string = customer?.name ?? ''
+    const customerPhone: string = customer?.cellphone ?? ''
 
     if (metadata.type === 'consular_fee') {
       // Taxa consular — atualizar processo existente
@@ -50,10 +71,6 @@ export async function POST(req: NextRequest) {
       const packageId = metadata.packageId as PackageId
       const couponCode = metadata.couponCode || ''
       const baseAmountCents = metadata.baseAmountCents ? Number(metadata.baseAmountCents) : amountCents
-
-      const customerEmail: string = customer?.email ?? ''
-      const customerName: string = customer?.name ?? ''
-      const customerPhone: string = customer?.cellphone ?? ''
 
       if (!packageId || !customerEmail) {
         return NextResponse.json({ received: true })
@@ -151,7 +168,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Enviar magic link para o cliente acessar o dashboard
+      // Enviar magic link ao cliente
       await supabaseAdmin.auth.admin.generateLink({
         type: 'magiclink',
         email: customerEmail,
