@@ -49,11 +49,34 @@ export default function MensagensPage() {
     init()
   }, [])
 
-  // Polling a cada 5 segundos
+  // Supabase Realtime — escuta novas mensagens em tempo real
   useEffect(() => {
     if (!processId) return
-    const interval = setInterval(() => fetchMessages(processId), 5000)
-    return () => clearInterval(interval)
+
+    const channel = supabase
+      .channel(`messages-client-${processId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `process_id=eq.${processId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as Message
+          setMessages((prev) => {
+            // Evitar duplicatas (caso a mensagem já tenha sido adicionada otimisticamente)
+            if (prev.some((m) => m.id === newMsg.id)) return prev
+            return [...prev, newMsg]
+          })
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [processId])
 
   useEffect(() => {
