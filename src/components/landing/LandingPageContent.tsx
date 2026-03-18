@@ -29,6 +29,29 @@ const TESTIMONIALS = [
 
 export default function LandingPageContent() {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [leadForm, setLeadForm] = useState({ name: '', email: '', phone: '', package: '' })
+  const [leadStatus, setLeadStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+  const handleLeadSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLeadStatus('loading')
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: leadForm.name,
+          email: leadForm.email,
+          phone: leadForm.phone || undefined,
+          interested_package: leadForm.package || undefined,
+          source: 'site',
+        }),
+      })
+      setLeadStatus(res.ok ? 'success' : 'error')
+    } catch {
+      setLeadStatus('error')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -293,6 +316,101 @@ export default function LandingPageContent() {
               </div>
             ))}
           </dl>
+        </div>
+      </section>
+
+      {/* LEAD CAPTURE */}
+      <section className="py-20 bg-slate-900 text-white" aria-label="Receba material gratuito">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <span className="inline-block text-xs font-bold uppercase tracking-widest text-blue-400 mb-4">Guia gratuito</span>
+              <h2 className="text-3xl font-bold mb-4">Checklist completo para o visto americano</h2>
+              <p className="text-slate-300 mb-6">Receba gratuitamente o guia com todos os documentos necessários, dicas de entrevista e os erros mais comuns que reprovam pedidos de visto B1/B2.</p>
+              <ul className="space-y-2 text-sm text-slate-300">
+                {['Lista completa de documentos obrigatórios', 'Dicas para a entrevista no consulado', 'Erros que reprovam 80% dos pedidos', 'Cronograma ideal do processo'].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              {leadStatus === 'success' ? (
+                <div className="bg-green-900/40 border border-green-500/30 rounded-2xl p-8 text-center">
+                  <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Enviado! Verifique seu email</h3>
+                  <p className="text-slate-300 text-sm">O checklist foi enviado para <strong>{leadForm.email}</strong>. Verifique também sua caixa de spam.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleLeadSubmit} className="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Seu nome *</label>
+                    <input
+                      type="text"
+                      required
+                      value={leadForm.name}
+                      onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
+                      placeholder="Maria da Silva"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Seu melhor email *</label>
+                    <input
+                      type="email"
+                      required
+                      value={leadForm.email}
+                      onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                      placeholder="maria@email.com"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">WhatsApp (opcional)</label>
+                    <input
+                      type="tel"
+                      value={leadForm.phone}
+                      onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
+                      placeholder="(11) 99999-9999"
+                      className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-1.5">Quantas pessoas precisam do visto?</label>
+                    <select
+                      value={leadForm.package}
+                      onChange={(e) => setLeadForm({ ...leadForm, package: e.target.value })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    >
+                      <option value="">Selecione</option>
+                      <option value="start_plus">1 pessoa (Start+)</option>
+                      <option value="pro_plus">2 a 3 pessoas (Pro+)</option>
+                      <option value="vip_plus">4 a 6 pessoas (Vip+)</option>
+                    </select>
+                  </div>
+                  {leadStatus === 'error' && (
+                    <p className="text-sm text-red-400">Ocorreu um erro. Tente novamente.</p>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={leadStatus === 'loading'}
+                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-70 text-white font-bold py-3.5 rounded-xl transition-colors"
+                  >
+                    {leadStatus === 'loading' ? 'Enviando...' : 'Quero receber o checklist grátis →'}
+                  </button>
+                  <p className="text-xs text-slate-500 text-center">Sem spam. Cancelamento fácil a qualquer momento.</p>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 

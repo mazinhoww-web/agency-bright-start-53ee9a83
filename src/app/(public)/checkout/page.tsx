@@ -40,6 +40,7 @@ function CheckoutPageInner() {
   const [step, setStep] = useState<1 | 2>(1)
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', cpf: '' })
   const [loading, setLoading] = useState(false)
+  const [leadCaptured, setLeadCaptured] = useState(false)
   const [couponCode, setCouponCode] = useState('')
   const [couponResult, setCouponResult] = useState<{ valid: boolean; discount_in_cents: number; final_amount_in_cents: number; coupon: { id: string; code: string; discount_type: string; discount_value: number; influencer_name: string | null } } | null>(null)
   const [couponError, setCouponError] = useState('')
@@ -70,6 +71,22 @@ function CheckoutPageInner() {
   }
 
   const finalPriceInCents = couponResult ? couponResult.final_amount_in_cents : pkg.priceInCents
+
+  const handleEmailBlur = async () => {
+    if (leadCaptured || !formData.email || !formData.email.includes('@')) return
+    setLeadCaptured(true)
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: formData.name || formData.email.split('@')[0],
+        email: formData.email,
+        phone: formData.phone || undefined,
+        interested_package: selectedPackage,
+        source: 'site',
+      }),
+    }).catch(() => {})
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -240,6 +257,7 @@ function CheckoutPageInner() {
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onBlur={handleEmailBlur}
                       className="w-full border border-slate-300 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:border-transparent transition-all"
                       placeholder="joao@email.com"
                     />
