@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 type Message = {
   id: string
@@ -123,6 +124,41 @@ export default function ProcessoDetailPage({ params }: { params: { id: string } 
   useEffect(() => {
     if (activeTab === 'mensagens') fetchMessages()
   }, [activeTab])
+
+  // Supabase Realtime — escuta novas mensagens em tempo real quando a aba mensagens está ativa
+  useEffect(() => {
+    if (activeTab !== 'mensagens') return
+
+    const supabase = createClient()
+    const channel = supabase
+      .channel(`messages-admin-${params.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `process_id=eq.${params.id}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as Message
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev
+            const updated = [...prev, newMsg]
+            // Atualizar contagem de não lidas
+            if (newMsg.sender_type === 'client' && !newMsg.is_read) {
+              setUnreadCount((c) => c + 1)
+            }
+            return updated
+          })
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [activeTab, params.id])
 
   const handleStatusUpdate = async () => {
     setSaving(true)
