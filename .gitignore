@@ -51,3 +51,4 @@ supabase/functions/.env
 
 # Planning docs (local)
 .planning/
+.claude/
