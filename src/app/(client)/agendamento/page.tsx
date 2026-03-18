@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import { CONSULADOS, CASVS } from '@/config/locations'
 
 export default function AgendamentoPage() {
@@ -11,14 +12,84 @@ export default function AgendamentoPage() {
   const [consulateDate, setConsulateDate] = useState('')
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [processId, setProcessId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadProcess = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const { data: process } = await supabase
+        .from('processes')
+        .select('id, casv_city, casv_intended_date, consulate_city, consulate_intended_date, appointment_disclaimer_accepted_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (process) {
+        setProcessId(process.id)
+        if (process.casv_city) setCasvCity(process.casv_city)
+        if (process.casv_intended_date) setCasvDate(process.casv_intended_date)
+        if (process.consulate_city) setConsulateCity(process.consulate_city)
+        if (process.consulate_intended_date) setConsulateDate(process.consulate_intended_date)
+        if (process.appointment_disclaimer_accepted_at) setSubmitted(true)
+      }
+    }
+
+    loadProcess()
+  }, [])
 
   const canSubmit = casvCity && consulateCity && casvDate && consulateDate && disclaimerAccepted
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!canSubmit) return
-    // TODO: salvar no Supabase
-    setSubmitted(true)
+
+    setSaving(true)
+    setSaveError(null)
+
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Não autenticado')
+
+      let pid = processId
+      if (!pid) {
+        const { data: process } = await supabase
+          .from('processes')
+          .select('id')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+        if (!process) throw new Error('Processo não encontrado')
+        pid = process.id
+      }
+
+      const { error } = await supabase
+        .from('processes')
+        .update({
+          casv_city: casvCity,
+          casv_intended_date: casvDate,
+          consulate_city: consulateCity,
+          consulate_intended_date: consulateDate,
+          appointment_disclaimer_accepted_at: new Date().toISOString(),
+        })
+        .eq('id', pid)
+
+      if (error) throw error
+
+      setSubmitted(true)
+    } catch (err) {
+      console.error('Error saving agendamento:', err)
+      setSaveError('Erro ao salvar. Tente novamente.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (submitted) {
@@ -57,6 +128,12 @@ export default function AgendamentoPage() {
         <h1 className="text-2xl font-bold text-slate-900 mb-1">Solicitação de Agendamento</h1>
         <p className="text-slate-600">Informe suas preferências para o CASV e consulado.</p>
       </div>
+
+      {saveError && (
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+          {saveError}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* CASV */}
@@ -138,10 +215,10 @@ export default function AgendamentoPage() {
 
         <button
           type="submit"
-          disabled={!canSubmit}
+          disabled={!canSubmit || saving}
           className="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors text-lg"
         >
-          Enviar solicitação →
+          {saving ? 'Salvando...' : 'Enviar solicitação →'}
         </button>
       </form>
     </div>
