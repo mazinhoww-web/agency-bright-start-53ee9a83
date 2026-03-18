@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import type { Database } from '@/types/database'
+
+type CouponRow = Database['public']['Tables']['coupons']['Row']
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +17,7 @@ export async function POST(req: NextRequest) {
       .select('*')
       .eq('code', code.toUpperCase().trim())
       .eq('is_active', true)
-      .single()
+      .single() as { data: CouponRow | null; error: unknown }
 
     if (error || !coupon) {
       return NextResponse.json({ error: 'Cupom inválido ou inativo' }, { status: 404 })

@@ -41,6 +41,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['processes']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['processes']['Insert']>
+        Relationships: []
       }
       applicants: {
         Row: {
@@ -91,6 +92,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['applicants']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['applicants']['Insert']>
+        Relationships: []
       }
       documents: {
         Row: {
@@ -105,6 +107,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['documents']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['documents']['Insert']>
+        Relationships: []
       }
       available_dates: {
         Row: {
@@ -118,6 +121,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['available_dates']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['available_dates']['Insert']>
+        Relationships: []
       }
       whatsapp_logs: {
         Row: {
@@ -132,6 +136,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['whatsapp_logs']['Row'], 'id' | 'sent_at'>
         Update: Partial<Database['public']['Tables']['whatsapp_logs']['Insert']>
+        Relationships: []
       }
       admin_audit_log: {
         Row: {
@@ -146,6 +151,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['admin_audit_log']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['admin_audit_log']['Insert']>
+        Relationships: []
       }
       admin_notes: {
         Row: {
@@ -157,6 +163,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['admin_notes']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['admin_notes']['Insert']>
+        Relationships: []
       }
       coupons: {
         Row: {
@@ -175,6 +182,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['coupons']['Row'], 'id' | 'created_at' | 'uses_count' | 'total_revenue_generated'>
         Update: Partial<Database['public']['Tables']['coupons']['Insert']>
+        Relationships: []
       }
       coupon_uses: {
         Row: {
@@ -189,6 +197,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['coupon_uses']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['coupon_uses']['Insert']>
+        Relationships: []
       }
       messages: {
         Row: {
@@ -202,6 +211,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['messages']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['messages']['Insert']>
+        Relationships: []
       }
       whatsapp_templates: {
         Row: {
@@ -215,6 +225,7 @@ export type Database = {
         }
         Insert: Omit<Database['public']['Tables']['whatsapp_templates']['Row'], 'id' | 'created_at'>
         Update: Partial<Database['public']['Tables']['whatsapp_templates']['Insert']>
+        Relationships: []
       }
       whatsapp_inbound: {
         Row: {
@@ -227,9 +238,21 @@ export type Database = {
           z_api_data: Record<string, unknown> | null
           received_at: string
         }
-        Insert: Omit<Database['public']['Tables']['whatsapp_inbound']['Row'], 'id' | 'received_at'>
+        Insert: {
+          from_phone: string
+          from_name?: string | null
+          message: string
+          is_read?: boolean
+          process_id?: string | null
+          z_api_data?: Record<string, unknown> | null
+        }
         Update: Partial<Database['public']['Tables']['whatsapp_inbound']['Insert']>
+        Relationships: []
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+    CompositeTypes: Record<string, never>
   }
 }

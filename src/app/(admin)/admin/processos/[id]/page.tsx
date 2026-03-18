@@ -7,6 +7,7 @@ type Message = {
   id: string
   sender_type: 'client' | 'admin'
   content: string
+  is_read?: boolean
   created_at: string
 }
 

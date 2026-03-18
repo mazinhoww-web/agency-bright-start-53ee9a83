@@ -17,9 +17,17 @@ type Coupon = {
   created_at: string
 }
 
-const emptyForm = {
+const emptyForm: {
+  code: string
+  discount_type: 'percentage' | 'fixed'
+  discount_value: string
+  influencer_name: string
+  influencer_email: string
+  max_uses: string
+  expires_at: string
+} = {
   code: '',
-  discount_type: 'percentage' as const,
+  discount_type: 'percentage',
   discount_value: '',
   influencer_name: '',
   influencer_email: '',

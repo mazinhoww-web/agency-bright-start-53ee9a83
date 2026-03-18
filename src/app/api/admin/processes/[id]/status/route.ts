@@ -4,24 +4,25 @@ import type { ProcessStatus } from '@/types/database'
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { status, notifyWhatsApp } = await req.json()
-    const processId = params.id
+    const { id: processId } = await params
 
     if (!status) {
       return NextResponse.json({ error: 'status obrigatório' }, { status: 400 })
     }
 
     // Buscar processo com dados do cliente (via user_id)
-    const { data: process, error: fetchError } = await supabaseAdmin
+    type ProcessWithApplicants = { applicants: { given_name: string | null; surname: string | null; phone_mobile: string | null; is_primary: boolean }[] }
+    const { data: processData, error: fetchError } = await (supabaseAdmin
       .from('processes')
       .select('*, applicants!inner(given_name, surname, phone_mobile, is_primary)')
       .eq('id', processId)
-      .single()
+      .single() as unknown as Promise<{ data: ProcessWithApplicants | null; error: unknown }>)
 
-    if (fetchError || !process) {
+    if (fetchError || !processData) {
       return NextResponse.json({ error: 'Processo não encontrado' }, { status: 404 })
     }
 
@@ -35,7 +36,7 @@ export async function PATCH(
 
     // Notificar via WhatsApp se solicitado
     if (notifyWhatsApp) {
-      const primaryApplicant = process.applicants?.find((a: { is_primary: boolean }) => a.is_primary) || process.applicants?.[0]
+      const primaryApplicant = processData.applicants?.find((a: { is_primary: boolean }) => a.is_primary) || processData.applicants?.[0]
       const phone = primaryApplicant?.phone_mobile?.replace(/\D/g, '')
 
       if (phone) {
