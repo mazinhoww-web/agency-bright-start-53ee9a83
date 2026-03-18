@@ -82,6 +82,8 @@ export default function ProcessoDetailPage({ params }: { params: { id: string } 
   const [saving, setSaving] = useState(false)
   const [statusSaved, setStatusSaved] = useState(false)
   const [addingNote, setAddingNote] = useState(false)
+  const [uploadingDoc, setUploadingDoc] = useState(false)
+  const [removingDocId, setRemovingDocId] = useState<string | null>(null)
 
   // Mensagens
   const [messages, setMessages] = useState<Message[]>([])
@@ -196,6 +198,39 @@ export default function ProcessoDetailPage({ params }: { params: { id: string } 
     } finally {
       setAddingNote(false)
     }
+  }
+
+  const handleUploadDoc = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingDoc(true)
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const res = await fetch(`/api/admin/processes/${params.id}/documents`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    const data = await res.json()
+    if (data?.document && process) {
+      setProcess({ ...process, documents: [...(process.documents || []), data.document] })
+    }
+    setUploadingDoc(false)
+    // Limpar input
+    e.target.value = ''
+  }
+
+  const handleRemoveDoc = async (docId: string) => {
+    setRemovingDocId(docId)
+    await fetch(`/api/admin/processes/${params.id}/documents?docId=${docId}`, {
+      method: 'DELETE',
+    })
+    if (process) {
+      setProcess({ ...process, documents: process.documents.filter((d) => d.id !== docId) })
+    }
+    setRemovingDocId(null)
   }
 
   const handleSendReply = async () => {
@@ -334,9 +369,16 @@ export default function ProcessoDetailPage({ params }: { params: { id: string } 
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-bold text-slate-900">Documentos</h2>
-                <button className="text-sm bg-blue-700 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
-                  + Enviar documento
-                </button>
+                <label className={`text-sm bg-blue-700 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer ${uploadingDoc ? 'opacity-70 pointer-events-none' : ''}`}>
+                  {uploadingDoc ? 'Enviando...' : '+ Enviar documento'}
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleUploadDoc}
+                    disabled={uploadingDoc}
+                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  />
+                </label>
               </div>
               {(process.documents || []).length === 0 ? (
                 <p className="text-slate-500 text-sm">Nenhum documento enviado ainda.</p>
@@ -353,7 +395,13 @@ export default function ProcessoDetailPage({ params }: { params: { id: string } 
                         <p className="text-sm font-medium text-slate-900">{doc.name}</p>
                         <p className="text-xs text-slate-500">{new Date(doc.created_at).toLocaleDateString('pt-BR')}</p>
                       </div>
-                      <button className="text-xs text-red-600 hover:underline">Remover</button>
+                      <button
+                        onClick={() => handleRemoveDoc(doc.id)}
+                        disabled={removingDocId === doc.id}
+                        className="text-xs text-red-600 hover:underline disabled:opacity-50"
+                      >
+                        {removingDocId === doc.id ? '...' : 'Remover'}
+                      </button>
                     </div>
                   ))}
                 </div>

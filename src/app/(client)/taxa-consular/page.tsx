@@ -136,24 +136,27 @@ export default function TaxaConsularPage() {
   const [error, setError] = useState('')
   const [pixModal, setPixModal] = useState<PixModalData | null>(null)
 
-  const applicantsCount = 2 // mock — em produção vem do processo
+  const [applicantsCount, setApplicantsCount] = useState(1)
   const USD_AMOUNT = 185
 
   useEffect(() => {
-    // Buscar processo do usuário
+    // Buscar processo do usuário e contagem de solicitantes
     const fetchProcess = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
       const { data: process } = await supabase
         .from('processes')
-        .select('id')
+        .select('id, max_applicants')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single() as { data: { id: string } | null }
+        .single() as { data: { id: string; max_applicants: number } | null }
 
-      if (process) setProcessId(process.id)
+      if (process) {
+        setProcessId(process.id)
+        setApplicantsCount(process.max_applicants || 1)
+      }
     }
 
     fetchProcess()

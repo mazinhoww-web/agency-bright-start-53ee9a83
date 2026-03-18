@@ -2,20 +2,33 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // TODO: integrar com Supabase Auth magic link
-    setTimeout(() => {
-      setLoading(false)
-      setSent(true)
-    }, 1000)
+    setError('')
+
+    const supabase = createClient()
+    const { error: authError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    setLoading(false)
+    if (authError) {
+      setError('Não foi possível enviar o link. Tente novamente.')
+      return
+    }
+    setSent(true)
   }
 
   return (
@@ -35,6 +48,11 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           {!sent ? (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-700">
+                  {error}
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Seu e-mail
