@@ -1,44 +1,90 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CONSULADOS, CASVS } from '@/config/locations'
 
 type LocationType = 'casv' | 'consulate'
 
-const mockDates = [
-  { id: '1', location_type: 'casv' as LocationType, city: 'São Paulo', date: '2024-02-10', is_active: true },
-  { id: '2', location_type: 'casv' as LocationType, city: 'São Paulo', date: '2024-02-17', is_active: true },
-  { id: '3', location_type: 'casv' as LocationType, city: 'Rio de Janeiro', date: '2024-02-12', is_active: true },
-  { id: '4', location_type: 'consulate' as LocationType, city: 'São Paulo', date: '2024-02-15', is_active: true },
-  { id: '5', location_type: 'consulate' as LocationType, city: 'Brasília', date: '2024-02-20', is_active: false },
-]
+type DateRow = {
+  id: string
+  location_type: LocationType
+  city: string
+  date: string
+  is_active: boolean
+}
 
 export default function DatasPage() {
-  const [dates, setDates] = useState(mockDates)
+  const [dates, setDates] = useState<DateRow[]>([])
+  const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<LocationType>('casv')
   const [newDate, setNewDate] = useState({ city: '', date: '' })
+  const [saving, setSaving] = useState(false)
 
   const filtered = dates.filter((d) => d.location_type === tab)
   const locations = tab === 'casv' ? CASVS : CONSULADOS
 
-  const handleAdd = () => {
+  useEffect(() => {
+    async function fetchDates() {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/admin/datas')
+        const data = await res.json()
+        if (data?.dates) setDates(data.dates)
+      } catch (err) {
+        console.error('Error fetching dates:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchDates()
+  }, [])
+
+  const handleAdd = async () => {
     if (!newDate.city || !newDate.date) return
-    setDates([...dates, {
-      id: `d${Date.now()}`,
-      location_type: tab,
-      city: newDate.city,
-      date: newDate.date,
-      is_active: true,
-    }])
-    setNewDate({ city: '', date: '' })
+    setSaving(true)
+    try {
+      const res = await fetch('/api/admin/datas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location_type: tab, city: newDate.city, date: newDate.date, is_active: true }),
+      })
+      const data = await res.json()
+      if (data?.date) {
+        setDates((prev) => [...prev, data.date])
+        setNewDate({ city: '', date: '' })
+      }
+    } catch (err) {
+      console.error('Error adding date:', err)
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const toggleActive = (id: string) => {
-    setDates(dates.map((d) => d.id === id ? { ...d, is_active: !d.is_active } : d))
+  const toggleActive = async (id: string, current: boolean) => {
+    try {
+      const res = await fetch('/api/admin/datas', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, is_active: !current }),
+      })
+      const data = await res.json()
+      if (data?.date) {
+        setDates((prev) => prev.map((d) => d.id === id ? data.date : d))
+      }
+    } catch (err) {
+      console.error('Error toggling date:', err)
+    }
   }
 
-  const removeDate = (id: string) => {
-    setDates(dates.filter((d) => d.id !== id))
+  const removeDate = async (id: string) => {
+    try {
+      const res = await fetch(`/api/admin/datas?id=${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setDates((prev) => prev.filter((d) => d.id !== id))
+      }
+    } catch (err) {
+      console.error('Error removing date:', err)
+    }
   }
 
   return (
@@ -91,10 +137,10 @@ export default function DatasPage() {
           />
           <button
             onClick={handleAdd}
-            disabled={!newDate.city || !newDate.date}
+            disabled={!newDate.city || !newDate.date || saving}
             className="bg-blue-700 hover:bg-blue-800 disabled:opacity-50 text-white font-semibold px-6 py-3 rounded-xl transition-colors whitespace-nowrap"
           >
-            + Adicionar
+            {saving ? 'Adicionando...' : '+ Adicionar'}
           </button>
         </div>
       </div>
@@ -102,9 +148,11 @@ export default function DatasPage() {
       {/* Dates List */}
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-          <p className="text-sm font-semibold text-slate-700">{filtered.length} datas cadastradas</p>
+          <p className="text-sm font-semibold text-slate-700">{loading ? '…' : `${filtered.length} datas cadastradas`}</p>
         </div>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="p-16 text-center text-slate-400 text-sm">Carregando...</div>
+        ) : filtered.length === 0 ? (
           <div className="p-16 text-center text-slate-500">
             <p>Nenhuma data cadastrada para {tab === 'casv' ? 'CASV' : 'Consulado'}.</p>
           </div>
@@ -132,7 +180,7 @@ export default function DatasPage() {
                   </td>
                   <td className="px-6 py-4">
                     <button
-                      onClick={() => toggleActive(d.id)}
+                      onClick={() => toggleActive(d.id, d.is_active)}
                       className="text-sm text-blue-700 font-semibold hover:underline mr-3"
                     >
                       {d.is_active ? 'Desativar' : 'Ativar'}

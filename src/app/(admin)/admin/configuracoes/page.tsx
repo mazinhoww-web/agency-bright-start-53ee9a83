@@ -1,27 +1,71 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function ConfiguracoesPage() {
   const [prices, setPrices] = useState({
-    start_plus: 299,
-    pro_plus: 599,
-    vip_plus: 999,
+    price_start_plus: 299,
+    price_pro_plus: 599,
+    price_vip_plus: 999,
     consular_fee_usd: 185,
     markup_card: 1.10,
     markup_pix: 1.15,
   })
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
+  useEffect(() => {
+    async function fetchConfig() {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/admin/config')
+        const data = await res.json()
+        if (data?.config) {
+          const c = data.config
+          setPrices({
+            price_start_plus: Number(c.price_start_plus ?? 299),
+            price_pro_plus: Number(c.price_pro_plus ?? 599),
+            price_vip_plus: Number(c.price_vip_plus ?? 999),
+            consular_fee_usd: Number(c.consular_fee_usd ?? 185),
+            markup_card: Number(c.markup_card ?? 1.10),
+            markup_pix: Number(c.markup_pix ?? 1.15),
+          })
+        }
+      } catch (err) {
+        console.error('Error fetching config:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchConfig()
+  }, [])
+
   const handleSave = async () => {
     setSaving(true)
-    // TODO: salvar nas env vars ou no Supabase
-    setTimeout(() => {
+    try {
+      const updates: Record<string, string> = {
+        price_start_plus: String(prices.price_start_plus),
+        price_pro_plus: String(prices.price_pro_plus),
+        price_vip_plus: String(prices.price_vip_plus),
+        consular_fee_usd: String(prices.consular_fee_usd),
+        markup_card: String(prices.markup_card),
+        markup_pix: String(prices.markup_pix),
+      }
+      const res = await fetch('/api/admin/config', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates }),
+      })
+      if (res.ok) {
+        setSaved(true)
+        setTimeout(() => setSaved(false), 3000)
+      }
+    } catch (err) {
+      console.error('Error saving config:', err)
+    } finally {
       setSaving(false)
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
-    }, 1000)
+    }
   }
 
   return (
@@ -30,6 +74,12 @@ export default function ConfiguracoesPage() {
         <h1 className="text-2xl font-bold text-slate-900">Configurações</h1>
         <p className="text-slate-600 mt-1">Preços, integrações e configurações gerais.</p>
       </div>
+
+      {loading && (
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6 text-sm text-slate-500">
+          Carregando configurações...
+        </div>
+      )}
 
       {saved && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
@@ -45,9 +95,9 @@ export default function ConfiguracoesPage() {
         <h2 className="font-bold text-slate-900 mb-5">Preços dos pacotes (R$)</h2>
         <div className="space-y-4">
           {[
-            { key: 'start_plus' as const, label: 'Start+ (1 solicitante)' },
-            { key: 'pro_plus' as const, label: 'Pro+ (até 3 solicitantes)' },
-            { key: 'vip_plus' as const, label: 'Vip+ (até 6 solicitantes)' },
+            { key: 'price_start_plus' as const, label: 'Start+ (1 solicitante)' },
+            { key: 'price_pro_plus' as const, label: 'Pro+ (até 3 solicitantes)' },
+            { key: 'price_vip_plus' as const, label: 'Vip+ (até 6 solicitantes)' },
           ].map((pkg) => (
             <div key={pkg.key} className="flex items-center gap-4">
               <label className="flex-1 text-sm font-semibold text-slate-700">{pkg.label}</label>
@@ -57,7 +107,8 @@ export default function ConfiguracoesPage() {
                   type="number"
                   value={prices[pkg.key]}
                   onChange={(e) => setPrices({ ...prices, [pkg.key]: Number(e.target.value) })}
-                  className="w-28 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900"
+                  disabled={loading}
+                  className="w-28 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900 disabled:opacity-60"
                 />
               </div>
             </div>
@@ -77,7 +128,8 @@ export default function ConfiguracoesPage() {
                 type="number"
                 value={prices.consular_fee_usd}
                 onChange={(e) => setPrices({ ...prices, consular_fee_usd: Number(e.target.value) })}
-                className="w-24 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900"
+                disabled={loading}
+                className="w-24 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900 disabled:opacity-60"
               />
             </div>
           </div>
@@ -88,7 +140,8 @@ export default function ConfiguracoesPage() {
               step="0.01"
               value={prices.markup_card}
               onChange={(e) => setPrices({ ...prices, markup_card: Number(e.target.value) })}
-              className="w-24 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900"
+              disabled={loading}
+              className="w-24 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900 disabled:opacity-60"
             />
           </div>
           <div className="flex items-center gap-4">
@@ -98,7 +151,8 @@ export default function ConfiguracoesPage() {
               step="0.01"
               value={prices.markup_pix}
               onChange={(e) => setPrices({ ...prices, markup_pix: Number(e.target.value) })}
-              className="w-24 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900"
+              disabled={loading}
+              className="w-24 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-700 text-slate-900 disabled:opacity-60"
             />
           </div>
         </div>
@@ -131,7 +185,7 @@ export default function ConfiguracoesPage() {
 
       <button
         onClick={handleSave}
-        disabled={saving}
+        disabled={saving || loading}
         className="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-70 text-white font-bold py-4 rounded-xl transition-colors text-lg"
       >
         {saving ? 'Salvando...' : 'Salvar configurações'}

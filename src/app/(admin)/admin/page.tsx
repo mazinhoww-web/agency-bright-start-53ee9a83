@@ -1,21 +1,32 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-const STATS = [
-  { label: 'Total de processos', value: '47', change: '+5 este mês', color: 'text-blue-700', bg: 'bg-blue-50' },
-  { label: 'Aguardando formulário', value: '8', change: 'Ação necessária', color: 'text-amber-700', bg: 'bg-amber-50' },
-  { label: 'Taxa consular pendente', value: '12', change: 'Após formulário', color: 'text-purple-700', bg: 'bg-purple-50' },
-  { label: 'Processos concluídos', value: '22', change: '47% do total', color: 'text-green-700', bg: 'bg-green-50' },
-]
+type StatsData = {
+  total_processes: number
+  by_status: Record<string, number>
+  total_leads: number
+  completed_this_month: number
+}
 
-const RECENT_PROCESSES = [
-  { id: '1', client: 'João Silva', package: 'Pro+', status: 'consular_fee_paid', statusLabel: 'Taxa paga', date: '2024-01-20' },
-  { id: '2', client: 'Maria Oliveira', package: 'Start+', status: 'pending_form', statusLabel: 'Formulário pendente', date: '2024-01-19' },
-  { id: '3', client: 'Carlos Família', package: 'Vip+', status: 'appointment_requested', statusLabel: 'Agendamento solicitado', date: '2024-01-18' },
-  { id: '4', client: 'Ana Costa', package: 'Pro+', status: 'docs_ready', statusLabel: 'Documentos prontos', date: '2024-01-17' },
-  { id: '5', client: 'Pedro Santos', package: 'Start+', status: 'completed', statusLabel: 'Concluído', date: '2024-01-15' },
-]
+type ProcessRow = {
+  id: string
+  applicant_name: string | null
+  package: string
+  status: string
+  created_at: string
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  pending_form: 'Formulário pendente',
+  form_completed: 'Formulário enviado',
+  consular_fee_paid: 'Taxa paga',
+  appointment_requested: 'Agendamento solicitado',
+  docs_in_preparation: 'Preparando documentos',
+  docs_ready: 'Documentos prontos',
+  completed: 'Concluído',
+}
 
 const STATUS_BADGE: Record<string, string> = {
   pending_form: 'bg-amber-100 text-amber-700',
@@ -28,6 +39,65 @@ const STATUS_BADGE: Record<string, string> = {
 }
 
 export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<StatsData | null>(null)
+  const [recentProcesses, setRecentProcesses] = useState<ProcessRow[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      try {
+        const [statsRes, processesRes] = await Promise.all([
+          fetch('/api/admin/stats'),
+          fetch('/api/admin/processes?limit=5'),
+        ])
+        const statsData = await statsRes.json()
+        const processesData = await processesRes.json()
+
+        if (statsData && !statsData.error) setStats(statsData)
+        if (processesData?.processes) setRecentProcesses(processesData.processes)
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  const STATS = [
+    {
+      label: 'Total de processos',
+      value: stats ? String(stats.total_processes) : '—',
+      change: stats ? `+${stats.completed_this_month} concluídos este mês` : '',
+      color: 'text-blue-700',
+      bg: 'bg-blue-50',
+    },
+    {
+      label: 'Aguardando formulário',
+      value: stats ? String(stats.by_status['pending_form'] || 0) : '—',
+      change: 'Ação necessária',
+      color: 'text-amber-700',
+      bg: 'bg-amber-50',
+    },
+    {
+      label: 'Taxa consular pendente',
+      value: stats ? String(stats.by_status['form_completed'] || 0) : '—',
+      change: 'Após formulário',
+      color: 'text-purple-700',
+      bg: 'bg-purple-50',
+    },
+    {
+      label: 'Processos concluídos',
+      value: stats ? String(stats.by_status['completed'] || 0) : '—',
+      change: stats && stats.total_processes > 0
+        ? `${Math.round(((stats.by_status['completed'] || 0) / stats.total_processes) * 100)}% do total`
+        : '',
+      color: 'text-green-700',
+      bg: 'bg-green-50',
+    },
+  ]
+
   return (
     <div className="p-6 lg:p-10">
       {/* Header */}
@@ -41,9 +111,9 @@ export default function AdminDashboardPage() {
         {STATS.map((stat) => (
           <div key={stat.label} className="bg-white rounded-2xl border border-slate-200 p-5">
             <div className={`inline-flex items-center justify-center w-10 h-10 ${stat.bg} rounded-xl mb-3`}>
-              <span className={`text-xl font-bold ${stat.color}`}>{stat.value}</span>
+              <span className={`text-xl font-bold ${stat.color}`}>{loading ? '…' : stat.value}</span>
             </div>
-            <p className="font-bold text-slate-900 text-xl mb-0.5">{stat.value}</p>
+            <p className="font-bold text-slate-900 text-xl mb-0.5">{loading ? '…' : stat.value}</p>
             <p className="text-xs text-slate-500">{stat.label}</p>
             <p className={`text-xs font-semibold mt-1 ${stat.color}`}>{stat.change}</p>
           </div>
@@ -59,50 +129,60 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Cliente</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pacote</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Data</th>
-                <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {RECENT_PROCESSES.map((p) => (
-                <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-700 font-bold text-xs">{p.client[0]}</span>
-                      </div>
-                      <span className="font-medium text-slate-900">{p.client}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-700">{p.package}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_BADGE[p.status]}`}>
-                      {p.statusLabel}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-sm text-slate-500">{p.date}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <Link
-                      href={`/admin/processos/${p.id}`}
-                      className="text-sm text-blue-700 font-semibold hover:underline"
-                    >
-                      Ver →
-                    </Link>
-                  </td>
+          {loading ? (
+            <div className="p-8 text-center text-slate-400 text-sm">Carregando...</div>
+          ) : recentProcesses.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 text-sm">Nenhum processo encontrado.</div>
+          ) : (
+            <table className="w-full">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-100">
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Cliente</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Pacote</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Data</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Ação</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {recentProcesses.map((p) => (
+                  <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <span className="text-blue-700 font-bold text-xs">
+                            {(p.applicant_name || '?')[0].toUpperCase()}
+                          </span>
+                        </div>
+                        <span className="font-medium text-slate-900">{p.applicant_name || '—'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-slate-700">{p.package}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_BADGE[p.status] || 'bg-slate-100 text-slate-700'}`}>
+                        {STATUS_LABEL[p.status] || p.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-slate-500">
+                        {new Date(p.created_at).toLocaleDateString('pt-BR')}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/admin/processos/${p.id}`}
+                        className="text-sm text-blue-700 font-semibold hover:underline"
+                      >
+                        Ver →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
