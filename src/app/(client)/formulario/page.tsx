@@ -310,6 +310,7 @@ export default function FormularioPage() {
 
         // Populate form data from applicant
         const merged: Partial<FormData> = {
+          // Step 1
           surname: applicant.surname || '',
           given_name: applicant.given_name || '',
           other_names: applicant.other_names || '',
@@ -319,6 +320,16 @@ export default function FormularioPage() {
           birth_city: applicant.birth_city || '',
           birth_state: applicant.birth_state || '',
           birth_country: applicant.birth_country || '',
+          nationality: applicant.nationality || 'Brasileira',
+          cpf: applicant.cpf || '',
+          rg: applicant.rg || '',
+          has_other_nationality: applicant.has_other_nationality || false,
+          other_nationality_country: applicant.other_nationality_country || '',
+          other_nationality_passport: applicant.other_nationality_passport || '',
+          ssn: applicant.ssn || '',
+          us_tax_id: applicant.us_tax_id || '',
+          other_languages: applicant.other_languages || '',
+          // Step 2
           address_street: applicant.address_street || '',
           address_number: applicant.address_number || '',
           address_complement: applicant.address_complement || '',
@@ -328,17 +339,35 @@ export default function FormularioPage() {
           address_zip: applicant.address_zip || '',
           phone_residential: applicant.phone_residential || '',
           phone_mobile: applicant.phone_mobile || '',
+          phone_commercial: applicant.phone_commercial || '',
           email: applicant.email || '',
+          visa_delivery_same_address: applicant.visa_delivery_same_address !== undefined ? applicant.visa_delivery_same_address : true,
+          visa_delivery_other_address: applicant.visa_delivery_other_address || '',
+          // Step 3
           passport_type: applicant.passport_type || '',
           passport_number: applicant.passport_number || '',
           passport_country: applicant.passport_country || 'Brasil',
           passport_issue_date: applicant.passport_issue_date || '',
           passport_expiry_date: applicant.passport_expiry_date || '',
+          passport_issue_city_state: applicant.passport_issue_city_state || '',
+          passport_lost: applicant.passport_lost || false,
+          passport_lost_info: applicant.passport_lost_info || '',
+          // Step 4
           travel_purpose: applicant.travel_purpose || '',
           intended_arrival_date: applicant.intended_arrival_date || '',
           intended_stay_duration: applicant.intended_stay_duration || '',
           us_address: applicant.us_address || '',
+          trip_city: applicant.trip_city || '',
+          trip_hotel: applicant.trip_hotel || '',
           trip_payer: applicant.trip_payer || '',
+          trip_payer_name: applicant.trip_payer_name || '',
+          trip_payer_address: applicant.trip_payer_address || '',
+          trip_payer_phone: applicant.trip_payer_phone || '',
+          trip_payer_email: applicant.trip_payer_email || '',
+          trip_payer_relationship: applicant.trip_payer_relationship || '',
+          intl_travel: applicant.intl_travel || '',
+          travel_companions: applicant.travel_companions || [],
+          travel_group_agency: applicant.travel_group_agency || '',
         }
 
         // Employment data
@@ -348,7 +377,20 @@ export default function FormularioPage() {
         merged.emp_salary = emp.salary || ''
         merged.emp_employed_since = emp.employed_since || ''
         merged.emp_employer_address = emp.employer_address || ''
+        merged.emp_employer_city_state = emp.employer_city_state || ''
+        merged.emp_employer_phone = emp.employer_phone || ''
+        merged.emp_employer_zip = emp.employer_zip || ''
+        merged.emp_supervisor = emp.supervisor || ''
         merged.emp_currently_employed = emp.currently_employed !== undefined ? emp.currently_employed : true
+        merged.emp_prev_employer = emp.prev_employer || ''
+        merged.emp_prev_address = emp.prev_address || ''
+        merged.emp_prev_city_state = emp.prev_city_state || ''
+        merged.emp_prev_phone = emp.prev_phone || ''
+        merged.emp_prev_zip = emp.prev_zip || ''
+        merged.emp_prev_job_title = emp.prev_job_title || ''
+        merged.emp_prev_supervisor = emp.prev_supervisor || ''
+        merged.emp_prev_start_date = emp.prev_start_date || ''
+        merged.emp_prev_end_date = emp.prev_end_date || ''
 
         // Education data
         const edu = applicant.education_data || {}
@@ -356,6 +398,7 @@ export default function FormularioPage() {
         merged.edu_field_of_study = edu.field_of_study || ''
         merged.edu_graduation_year = edu.graduation_year || ''
         merged.edu_education_level = edu.education_level || ''
+        merged.edu_schools = edu.schools || []
 
         // Family data
         const fam = applicant.family_data || {}
@@ -363,16 +406,33 @@ export default function FormularioPage() {
         merged.fam_father_birthdate = fam.father_birthdate || ''
         merged.fam_father_birthplace = fam.father_birthplace || ''
         merged.fam_father_nationality = fam.father_nationality || 'Brasileira'
+        merged.fam_father_in_usa = fam.father_in_usa || false
+        merged.fam_father_usa_status = fam.father_usa_status || ''
         merged.fam_mother_name = fam.mother_name || ''
         merged.fam_mother_birthdate = fam.mother_birthdate || ''
         merged.fam_mother_birthplace = fam.mother_birthplace || ''
         merged.fam_mother_nationality = fam.mother_nationality || 'Brasileira'
+        merged.fam_mother_in_usa = fam.mother_in_usa || false
+        merged.fam_mother_usa_status = fam.mother_usa_status || ''
+        merged.rel_in_usa_name = fam.rel_in_usa_name || ''
+        merged.rel_in_usa_relationship = fam.rel_in_usa_relationship || ''
+        merged.rel_in_usa_status = fam.rel_in_usa_status || ''
         merged.fam_has_spouse = fam.has_spouse || false
         merged.fam_spouse_name = fam.spouse_name || ''
+        merged.fam_spouse_birthdate = fam.spouse_birthdate || ''
+        merged.fam_spouse_nationality = fam.spouse_nationality || ''
+        merged.fam_spouse_birth_city = fam.spouse_birth_city || ''
+        merged.fam_divorced = fam.divorced || false
+        merged.ex_spouse_name = fam.ex_spouse_name || ''
+        merged.ex_spouse_birthdate = fam.ex_spouse_birthdate || ''
+        merged.ex_spouse_address = fam.ex_spouse_address || ''
+        merged.ex_marriage_date = fam.ex_marriage_date || ''
+        merged.ex_divorce_date = fam.ex_divorce_date || ''
+        merged.ex_divorce_reason = fam.ex_divorce_reason || ''
         merged.fam_has_children = fam.has_children || false
         merged.fam_children = fam.children || []
 
-        // Previous travel
+        // Previous travel + visa history
         const prev = applicant.previous_us_travel || {}
         merged.prev_visited_before = prev.visited_before || false
         merged.prev_last_visit_date = prev.last_visit_date || ''
@@ -382,6 +442,26 @@ export default function FormularioPage() {
         merged.prev_cancel_reason = prev.cancel_reason || ''
         merged.prev_overstayed = prev.overstayed || false
         merged.prev_visit_dates = prev.visit_dates || []
+        merged.had_us_visa = prev.had_us_visa || false
+        merged.us_visa_number = prev.us_visa_number || ''
+        merged.us_visa_type = prev.us_visa_type || ''
+        merged.us_visa_issue_date = prev.us_visa_issue_date || ''
+        merged.us_visa_expiry_date = prev.us_visa_expiry_date || ''
+        merged.us_visa_fingerprints = prev.us_visa_fingerprints || false
+        merged.us_visa_lost = prev.us_visa_lost || false
+        merged.us_visa_lost_when = prev.us_visa_lost_when || ''
+        merged.us_driver_license = prev.us_driver_license || false
+        merged.us_driver_license_number = prev.us_driver_license_number || ''
+        merged.us_driver_license_state = prev.us_driver_license_state || ''
+        merged.us_contact_name = prev.us_contact_name || ''
+        merged.us_contact_address = prev.us_contact_address || ''
+        merged.us_contact_phone = prev.us_contact_phone || ''
+        merged.us_contact_email = prev.us_contact_email || ''
+        merged.us_contact_relationship = prev.us_contact_relationship || ''
+        merged.military_served = prev.military_served || false
+        merged.military_country = prev.military_country || ''
+        merged.military_rank = prev.military_rank || ''
+        merged.military_period = prev.military_period || ''
 
         // Social media
         const social = applicant.social_media || {}
@@ -389,22 +469,12 @@ export default function FormularioPage() {
 
         // Security questions
         const sec = applicant.security_questions || {}
-        merged.sec_q1 = sec.q1 !== undefined ? sec.q1 : null
-        merged.sec_q1_details = sec.q1_details || ''
-        merged.sec_q2 = sec.q2 !== undefined ? sec.q2 : null
-        merged.sec_q2_details = sec.q2_details || ''
-        merged.sec_q3 = sec.q3 !== undefined ? sec.q3 : null
-        merged.sec_q3_details = sec.q3_details || ''
-        merged.sec_q4 = sec.q4 !== undefined ? sec.q4 : null
-        merged.sec_q4_details = sec.q4_details || ''
-        merged.sec_q5 = sec.q5 !== undefined ? sec.q5 : null
-        merged.sec_q5_details = sec.q5_details || ''
-        merged.sec_q6 = sec.q6 !== undefined ? sec.q6 : null
-        merged.sec_q6_details = sec.q6_details || ''
-        merged.sec_q7 = sec.q7 !== undefined ? sec.q7 : null
-        merged.sec_q7_details = sec.q7_details || ''
-        merged.sec_q8 = sec.q8 !== undefined ? sec.q8 : null
-        merged.sec_q8_details = sec.q8_details || ''
+        for (let i = 1; i <= 16; i++) {
+          const k = `q${i}` as keyof typeof sec
+          const dk = `q${i}_details` as keyof typeof sec
+          ;(merged as Record<string, unknown>)[`sec_q${i}`] = sec[k] !== undefined ? sec[k] : null
+          ;(merged as Record<string, unknown>)[`sec_q${i}_details`] = (sec[dk] as string) || ''
+        }
 
         setFormData((prev) => ({ ...prev, ...merged }))
 
@@ -435,6 +505,15 @@ export default function FormularioPage() {
           birth_city: formData.birth_city,
           birth_state: formData.birth_state,
           birth_country: formData.birth_country,
+          nationality: formData.nationality,
+          cpf: formData.cpf,
+          rg: formData.rg,
+          has_other_nationality: formData.has_other_nationality,
+          other_nationality_country: formData.has_other_nationality ? formData.other_nationality_country : '',
+          other_nationality_passport: formData.has_other_nationality ? formData.other_nationality_passport : '',
+          ssn: formData.ssn,
+          us_tax_id: formData.us_tax_id,
+          other_languages: formData.other_languages,
           form_step: 1,
         }
       case 2:
@@ -448,7 +527,10 @@ export default function FormularioPage() {
           address_zip: formData.address_zip,
           phone_residential: formData.phone_residential,
           phone_mobile: formData.phone_mobile,
+          phone_commercial: formData.phone_commercial,
           email: formData.email,
+          visa_delivery_same_address: formData.visa_delivery_same_address,
+          visa_delivery_other_address: formData.visa_delivery_same_address ? '' : formData.visa_delivery_other_address,
           form_step: 2,
         }
       case 3:
@@ -458,6 +540,9 @@ export default function FormularioPage() {
           passport_country: formData.passport_country,
           passport_issue_date: formData.passport_issue_date,
           passport_expiry_date: formData.passport_expiry_date,
+          passport_issue_city_state: formData.passport_issue_city_state,
+          passport_lost: formData.passport_lost,
+          passport_lost_info: formData.passport_lost ? formData.passport_lost_info : '',
           form_step: 3,
         }
       case 4:
@@ -466,7 +551,17 @@ export default function FormularioPage() {
           intended_arrival_date: formData.intended_arrival_date,
           intended_stay_duration: formData.intended_stay_duration,
           us_address: formData.us_address,
+          trip_city: formData.trip_city,
+          trip_hotel: formData.trip_hotel,
           trip_payer: formData.trip_payer,
+          trip_payer_name: formData.trip_payer !== 'self' ? formData.trip_payer_name : '',
+          trip_payer_address: formData.trip_payer !== 'self' ? formData.trip_payer_address : '',
+          trip_payer_phone: formData.trip_payer !== 'self' ? formData.trip_payer_phone : '',
+          trip_payer_email: formData.trip_payer !== 'self' ? formData.trip_payer_email : '',
+          trip_payer_relationship: formData.trip_payer !== 'self' ? formData.trip_payer_relationship : '',
+          intl_travel: formData.intl_travel,
+          travel_companions: formData.travel_companions,
+          travel_group_agency: formData.travel_group_agency,
           form_step: 4,
         }
       case 5:
@@ -477,13 +572,27 @@ export default function FormularioPage() {
             salary: formData.emp_salary,
             employed_since: formData.emp_employed_since,
             employer_address: formData.emp_employer_address,
+            employer_city_state: formData.emp_employer_city_state,
+            employer_phone: formData.emp_employer_phone,
+            employer_zip: formData.emp_employer_zip,
+            supervisor: formData.emp_supervisor,
             currently_employed: formData.emp_currently_employed,
+            prev_employer: formData.emp_prev_employer,
+            prev_address: formData.emp_prev_address,
+            prev_city_state: formData.emp_prev_city_state,
+            prev_phone: formData.emp_prev_phone,
+            prev_zip: formData.emp_prev_zip,
+            prev_job_title: formData.emp_prev_job_title,
+            prev_supervisor: formData.emp_prev_supervisor,
+            prev_start_date: formData.emp_prev_start_date,
+            prev_end_date: formData.emp_prev_end_date,
           },
           education_data: {
             last_school: formData.edu_last_school,
             field_of_study: formData.edu_field_of_study,
             graduation_year: formData.edu_graduation_year,
             education_level: formData.edu_education_level,
+            schools: formData.edu_schools,
           },
           form_step: 5,
         }
@@ -494,12 +603,29 @@ export default function FormularioPage() {
             father_birthdate: formData.fam_father_birthdate,
             father_birthplace: formData.fam_father_birthplace,
             father_nationality: formData.fam_father_nationality,
+            father_in_usa: formData.fam_father_in_usa,
+            father_usa_status: formData.fam_father_in_usa ? formData.fam_father_usa_status : '',
             mother_name: formData.fam_mother_name,
             mother_birthdate: formData.fam_mother_birthdate,
             mother_birthplace: formData.fam_mother_birthplace,
             mother_nationality: formData.fam_mother_nationality,
+            mother_in_usa: formData.fam_mother_in_usa,
+            mother_usa_status: formData.fam_mother_in_usa ? formData.fam_mother_usa_status : '',
+            rel_in_usa_name: formData.rel_in_usa_name,
+            rel_in_usa_relationship: formData.rel_in_usa_relationship,
+            rel_in_usa_status: formData.rel_in_usa_status,
             has_spouse: formData.fam_has_spouse,
             spouse_name: formData.fam_has_spouse ? formData.fam_spouse_name : '',
+            spouse_birthdate: formData.fam_has_spouse ? formData.fam_spouse_birthdate : '',
+            spouse_nationality: formData.fam_has_spouse ? formData.fam_spouse_nationality : '',
+            spouse_birth_city: formData.fam_has_spouse ? formData.fam_spouse_birth_city : '',
+            divorced: formData.fam_divorced,
+            ex_spouse_name: formData.fam_divorced ? formData.ex_spouse_name : '',
+            ex_spouse_birthdate: formData.fam_divorced ? formData.ex_spouse_birthdate : '',
+            ex_spouse_address: formData.fam_divorced ? formData.ex_spouse_address : '',
+            ex_marriage_date: formData.fam_divorced ? formData.ex_marriage_date : '',
+            ex_divorce_date: formData.fam_divorced ? formData.ex_divorce_date : '',
+            ex_divorce_reason: formData.fam_divorced ? formData.ex_divorce_reason : '',
             has_children: formData.fam_has_children,
             children: formData.fam_has_children ? formData.fam_children : [],
           },
@@ -516,6 +642,26 @@ export default function FormularioPage() {
             visa_cancelled: formData.prev_visa_cancelled,
             cancel_reason: formData.prev_visa_cancelled ? formData.prev_cancel_reason : '',
             overstayed: formData.prev_overstayed,
+            had_us_visa: formData.had_us_visa,
+            us_visa_number: formData.had_us_visa ? formData.us_visa_number : '',
+            us_visa_type: formData.had_us_visa ? formData.us_visa_type : '',
+            us_visa_issue_date: formData.had_us_visa ? formData.us_visa_issue_date : '',
+            us_visa_expiry_date: formData.had_us_visa ? formData.us_visa_expiry_date : '',
+            us_visa_fingerprints: formData.us_visa_fingerprints,
+            us_visa_lost: formData.us_visa_lost,
+            us_visa_lost_when: formData.us_visa_lost ? formData.us_visa_lost_when : '',
+            us_driver_license: formData.us_driver_license,
+            us_driver_license_number: formData.us_driver_license ? formData.us_driver_license_number : '',
+            us_driver_license_state: formData.us_driver_license ? formData.us_driver_license_state : '',
+            us_contact_name: formData.us_contact_name,
+            us_contact_address: formData.us_contact_address,
+            us_contact_phone: formData.us_contact_phone,
+            us_contact_email: formData.us_contact_email,
+            us_contact_relationship: formData.us_contact_relationship,
+            military_served: formData.military_served,
+            military_country: formData.military_served ? formData.military_country : '',
+            military_rank: formData.military_served ? formData.military_rank : '',
+            military_period: formData.military_served ? formData.military_period : '',
           },
           social_media: {
             platforms: formData.social_platforms,
@@ -525,22 +671,22 @@ export default function FormularioPage() {
       case 8:
         return {
           security_questions: {
-            q1: formData.sec_q1,
-            q1_details: formData.sec_q1 ? formData.sec_q1_details : '',
-            q2: formData.sec_q2,
-            q2_details: formData.sec_q2 ? formData.sec_q2_details : '',
-            q3: formData.sec_q3,
-            q3_details: formData.sec_q3 ? formData.sec_q3_details : '',
-            q4: formData.sec_q4,
-            q4_details: formData.sec_q4 ? formData.sec_q4_details : '',
-            q5: formData.sec_q5,
-            q5_details: formData.sec_q5 ? formData.sec_q5_details : '',
-            q6: formData.sec_q6,
-            q6_details: formData.sec_q6 ? formData.sec_q6_details : '',
-            q7: formData.sec_q7,
-            q7_details: formData.sec_q7 ? formData.sec_q7_details : '',
-            q8: formData.sec_q8,
-            q8_details: formData.sec_q8 ? formData.sec_q8_details : '',
+            q1: formData.sec_q1, q1_details: formData.sec_q1 ? formData.sec_q1_details : '',
+            q2: formData.sec_q2, q2_details: formData.sec_q2 ? formData.sec_q2_details : '',
+            q3: formData.sec_q3, q3_details: formData.sec_q3 ? formData.sec_q3_details : '',
+            q4: formData.sec_q4, q4_details: formData.sec_q4 ? formData.sec_q4_details : '',
+            q5: formData.sec_q5, q5_details: formData.sec_q5 ? formData.sec_q5_details : '',
+            q6: formData.sec_q6, q6_details: formData.sec_q6 ? formData.sec_q6_details : '',
+            q7: formData.sec_q7, q7_details: formData.sec_q7 ? formData.sec_q7_details : '',
+            q8: formData.sec_q8, q8_details: formData.sec_q8 ? formData.sec_q8_details : '',
+            q9: formData.sec_q9, q9_details: formData.sec_q9 ? formData.sec_q9_details : '',
+            q10: formData.sec_q10, q10_details: formData.sec_q10 ? formData.sec_q10_details : '',
+            q11: formData.sec_q11, q11_details: formData.sec_q11 ? formData.sec_q11_details : '',
+            q12: formData.sec_q12, q12_details: formData.sec_q12 ? formData.sec_q12_details : '',
+            q13: formData.sec_q13, q13_details: formData.sec_q13 ? formData.sec_q13_details : '',
+            q14: formData.sec_q14, q14_details: formData.sec_q14 ? formData.sec_q14_details : '',
+            q15: formData.sec_q15, q15_details: formData.sec_q15 ? formData.sec_q15_details : '',
+            q16: formData.sec_q16, q16_details: formData.sec_q16 ? formData.sec_q16_details : '',
           },
           form_step: 8,
           form_completed_at: new Date().toISOString(),
