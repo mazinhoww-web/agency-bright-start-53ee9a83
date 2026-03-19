@@ -935,6 +935,48 @@ export default function FormularioPage() {
                       {UF_OPTIONS.map(uf => <option key={uf} value={uf}>{uf}</option>)}
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Nacionalidade *</label>
+                    <input type="text" value={formData.nationality} onChange={(e) => updateField('nationality', e.target.value)} className={inputClass()} placeholder="Brasileira" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">CPF *</label>
+                    <input type="text" value={formData.cpf} onChange={(e) => updateField('cpf', e.target.value)} className={inputClass()} placeholder="000.000.000-00" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">RG</label>
+                    <input type="text" value={formData.rg} onChange={(e) => updateField('rg', e.target.value)} className={inputClass()} placeholder="00.000.000-0" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Idiomas além do português</label>
+                    <input type="text" value={formData.other_languages} onChange={(e) => updateField('other_languages', e.target.value)} className={inputClass()} placeholder="Ex: Inglês, Espanhol" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="flex items-center gap-3 cursor-pointer mb-3">
+                      <input type="checkbox" checked={formData.has_other_nationality} onChange={(e) => updateField('has_other_nationality', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                      <span className="text-sm font-semibold text-slate-700">Possuo outra nacionalidade além da brasileira</span>
+                    </label>
+                    {formData.has_other_nationality && (
+                      <div className="grid grid-cols-2 gap-3 pl-7">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">País da outra nacionalidade</label>
+                          <input type="text" value={formData.other_nationality_country} onChange={(e) => updateField('other_nationality_country', e.target.value)} className={inputClass()} placeholder="EUA" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Nº do passaporte desse país</label>
+                          <input type="text" value={formData.other_nationality_passport} onChange={(e) => updateField('other_nationality_passport', e.target.value)} className={inputClass()} placeholder="A12345678" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Social Security Number (SSN)</label>
+                    <input type="text" value={formData.ssn} onChange={(e) => updateField('ssn', e.target.value)} className={inputClass()} placeholder="Se possuir" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">US Tax Payer ID</label>
+                    <input type="text" value={formData.us_tax_id} onChange={(e) => updateField('us_tax_id', e.target.value)} className={inputClass()} placeholder="Se possuir" />
+                  </div>
                 </div>
               </div>
             )}
@@ -1035,15 +1077,25 @@ export default function FormularioPage() {
                       placeholder="(11) 98765-4321"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Tel. Comercial</label>
+                    <input type="tel" value={formData.phone_commercial} onChange={(e) => updateField('phone_commercial', e.target.value)} className={inputClass()} placeholder="(11) 3000-0000" />
+                  </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-semibold text-slate-700 mb-2">E-mail *</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => updateField('email', e.target.value)}
-                      className={inputClass()}
-                      placeholder="joao@email.com"
-                    />
+                    <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} className={inputClass()} placeholder="joao@email.com" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="flex items-center gap-3 cursor-pointer mb-2">
+                      <input type="checkbox" checked={formData.visa_delivery_same_address} onChange={(e) => updateField('visa_delivery_same_address', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                      <span className="text-sm font-semibold text-slate-700">Desejo receber o visto neste mesmo endereço</span>
+                    </label>
+                    {!formData.visa_delivery_same_address && (
+                      <div className="pl-7">
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">Endereço para entrega do visto</label>
+                        <input type="text" value={formData.visa_delivery_other_address} onChange={(e) => updateField('visa_delivery_other_address', e.target.value)} className={inputClass()} placeholder="Rua, número, cidade, estado, CEP" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1099,12 +1151,23 @@ export default function FormularioPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Data de validade *</label>
-                    <input
-                      type="date"
-                      value={formData.passport_expiry_date}
-                      onChange={(e) => updateField('passport_expiry_date', e.target.value)}
-                      className={inputClass()}
-                    />
+                    <input type="date" value={formData.passport_expiry_date} onChange={(e) => updateField('passport_expiry_date', e.target.value)} className={inputClass()} />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Cidade/Estado de emissão</label>
+                    <input type="text" value={formData.passport_issue_city_state} onChange={(e) => updateField('passport_issue_city_state', e.target.value)} className={inputClass()} placeholder="São Paulo, SP" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="flex items-center gap-3 cursor-pointer mb-2">
+                      <input type="checkbox" checked={formData.passport_lost} onChange={(e) => updateField('passport_lost', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                      <span className="text-sm font-semibold text-slate-700">Já tive passaporte perdido ou roubado</span>
+                    </label>
+                    {formData.passport_lost && (
+                      <div className="pl-7">
+                        <label className="block text-xs font-semibold text-slate-600 mb-1">Número, país e data de quando foi perdido/roubado</label>
+                        <textarea value={formData.passport_lost_info} onChange={(e) => updateField('passport_lost_info', e.target.value)} className={`${inputClass()} min-h-[70px] resize-y`} placeholder="Descreva as circunstâncias..." />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1159,19 +1222,76 @@ export default function FormularioPage() {
                       placeholder="Nome do hotel ou endereço completo onde ficará hospedado"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Cidade(s) de destino nos EUA</label>
+                    <input type="text" value={formData.trip_city} onChange={(e) => updateField('trip_city', e.target.value)} className={inputClass()} placeholder="Miami, Orlando" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Nome do hotel / hospedagem</label>
+                    <input type="text" value={formData.trip_hotel} onChange={(e) => updateField('trip_hotel', e.target.value)} className={inputClass()} placeholder="Hotel ou endereço de hospedagem" />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Países visitados nos últimos 5 anos (exceto EUA)</label>
+                    <input type="text" value={formData.intl_travel} onChange={(e) => updateField('intl_travel', e.target.value)} className={inputClass()} placeholder="Ex: Argentina, Portugal, Itália" />
+                  </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-semibold text-slate-700 mb-2">Quem pagará pela viagem? *</label>
-                    <select
-                      value={formData.trip_payer}
-                      onChange={(e) => updateField('trip_payer', e.target.value)}
-                      className={inputClass()}
-                    >
+                    <select value={formData.trip_payer} onChange={(e) => updateField('trip_payer', e.target.value)} className={inputClass()}>
                       <option value="">Selecione</option>
                       <option value="self">Eu mesmo</option>
                       <option value="company">Empresa</option>
                       <option value="relative">Familiar/Parente</option>
                       <option value="other">Outro</option>
                     </select>
+                  </div>
+                  {formData.trip_payer && formData.trip_payer !== 'self' && (
+                    <>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Nome de quem paga</label>
+                        <input type="text" value={formData.trip_payer_name} onChange={(e) => updateField('trip_payer_name', e.target.value)} className={inputClass()} placeholder="Nome completo" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Relação com você</label>
+                        <input type="text" value={formData.trip_payer_relationship} onChange={(e) => updateField('trip_payer_relationship', e.target.value)} className={inputClass()} placeholder="Cônjuge, pai, empresa..." />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Telefone</label>
+                        <input type="tel" value={formData.trip_payer_phone} onChange={(e) => updateField('trip_payer_phone', e.target.value)} className={inputClass()} placeholder="(11) 98765-4321" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">E-mail</label>
+                        <input type="email" value={formData.trip_payer_email} onChange={(e) => updateField('trip_payer_email', e.target.value)} className={inputClass()} placeholder="email@exemplo.com" />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Endereço</label>
+                        <input type="text" value={formData.trip_payer_address} onChange={(e) => updateField('trip_payer_address', e.target.value)} className={inputClass()} placeholder="Rua, número, cidade, estado" />
+                      </div>
+                    </>
+                  )}
+                  <div className="col-span-2">
+                    <p className="text-sm font-semibold text-slate-700 mb-2">Companheiros de viagem</p>
+                    <div className="space-y-2">
+                      {formData.travel_companions.map((c, idx) => (
+                        <div key={idx} className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200">
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-600 mb-1">Nome</label>
+                            <input type="text" value={c.name} onChange={(e) => { const u = [...formData.travel_companions]; u[idx] = { ...u[idx], name: e.target.value }; updateField('travel_companions', u) }} className={inputClass()} />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-slate-600 mb-1">Parentesco / Relação</label>
+                            <input type="text" value={c.relationship} onChange={(e) => { const u = [...formData.travel_companions]; u[idx] = { ...u[idx], relationship: e.target.value }; updateField('travel_companions', u) }} className={inputClass()} placeholder="Cônjuge, filho..." />
+                          </div>
+                          <div className="col-span-2 flex justify-end">
+                            <button type="button" onClick={() => updateField('travel_companions', formData.travel_companions.filter((_, i) => i !== idx))} className="text-xs text-red-600 font-semibold hover:text-red-800">Remover</button>
+                          </div>
+                        </div>
+                      ))}
+                      <button type="button" onClick={() => updateField('travel_companions', [...formData.travel_companions, { name: '', relationship: '' }])} className="text-sm text-blue-700 font-semibold hover:underline">+ Adicionar companheiro</button>
+                    </div>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Agência de turismo / Grupo organizado (se aplicável)</label>
+                    <input type="text" value={formData.travel_group_agency} onChange={(e) => updateField('travel_group_agency', e.target.value)} className={inputClass()} placeholder="Nome da agência ou grupo" />
                   </div>
                 </div>
               </div>
