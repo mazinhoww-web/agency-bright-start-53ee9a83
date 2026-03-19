@@ -79,7 +79,7 @@ async function processQueue(): Promise<NextResponse> {
         const { count: vagasCount } = await supabaseAdmin
           .from('available_dates')
           .select('*', { count: 'exact', head: true })
-          .eq('is_available', true)
+          .eq('is_active', true)
           .gte('date', new Date().toISOString().split('T')[0])
 
         const vagas = vagasCount ?? 3

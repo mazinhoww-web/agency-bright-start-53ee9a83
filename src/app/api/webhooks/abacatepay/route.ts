@@ -163,7 +163,7 @@ export async function POST(req: NextRequest) {
           await supabaseAdmin.from('coupon_uses').insert({
             coupon_id: coupon.id,
             process_id: newProcess.id,
-            discount_applied_cents: discountCents,
+            discount_applied_brl: discountCents / 100,
           } as never)
         }
       }
