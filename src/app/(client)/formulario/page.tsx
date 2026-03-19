@@ -23,6 +23,8 @@ const UF_OPTIONS = [
 type Child = { name: string; birthdate: string }
 type VisitDate = { from: string; to: string; purpose: string }
 type SocialPlatform = { name: string; handle: string }
+type Companion = { name: string; relationship: string }
+type School = { name: string; address: string; city_state: string; zip: string; course: string; start_month_year: string; end_month_year: string }
 
 type FormData = {
   // Step 1
@@ -35,6 +37,15 @@ type FormData = {
   birth_city: string
   birth_state: string
   birth_country: string
+  nationality: string
+  cpf: string
+  rg: string
+  has_other_nationality: boolean
+  other_nationality_country: string
+  other_nationality_passport: string
+  ssn: string
+  us_tax_id: string
+  other_languages: string
   // Step 2
   address_street: string
   address_number: string
@@ -45,44 +56,91 @@ type FormData = {
   address_zip: string
   phone_residential: string
   phone_mobile: string
+  phone_commercial: string
   email: string
+  visa_delivery_same_address: boolean
+  visa_delivery_other_address: string
   // Step 3
   passport_type: string
   passport_number: string
   passport_country: string
   passport_issue_date: string
   passport_expiry_date: string
+  passport_issue_city_state: string
+  passport_lost: boolean
+  passport_lost_info: string
   // Step 4
   travel_purpose: string
   intended_arrival_date: string
   intended_stay_duration: string
   us_address: string
+  trip_city: string
+  trip_hotel: string
   trip_payer: string
+  trip_payer_name: string
+  trip_payer_address: string
+  trip_payer_phone: string
+  trip_payer_email: string
+  trip_payer_relationship: string
+  intl_travel: string
+  travel_companions: Companion[]
+  travel_group_agency: string
   // Step 5 (employment_data)
   emp_employer: string
   emp_job_title: string
   emp_salary: string
   emp_employed_since: string
   emp_employer_address: string
+  emp_employer_city_state: string
+  emp_employer_phone: string
+  emp_employer_zip: string
+  emp_supervisor: string
   emp_currently_employed: boolean
+  emp_prev_employer: string
+  emp_prev_address: string
+  emp_prev_city_state: string
+  emp_prev_phone: string
+  emp_prev_zip: string
+  emp_prev_job_title: string
+  emp_prev_supervisor: string
+  emp_prev_start_date: string
+  emp_prev_end_date: string
   edu_last_school: string
   edu_field_of_study: string
   edu_graduation_year: string
   edu_education_level: string
+  edu_schools: School[]
   // Step 6 (family_data)
   fam_father_name: string
   fam_father_birthdate: string
   fam_father_birthplace: string
   fam_father_nationality: string
+  fam_father_in_usa: boolean
+  fam_father_usa_status: string
   fam_mother_name: string
   fam_mother_birthdate: string
   fam_mother_birthplace: string
   fam_mother_nationality: string
+  fam_mother_in_usa: boolean
+  fam_mother_usa_status: string
+  rel_in_usa_name: string
+  rel_in_usa_relationship: string
+  rel_in_usa_status: string
   fam_has_spouse: boolean
   fam_spouse_name: string
+  fam_spouse_birthdate: string
+  fam_spouse_nationality: string
+  fam_spouse_birth_city: string
+  fam_divorced: boolean
+  ex_spouse_name: string
+  ex_spouse_birthdate: string
+  ex_spouse_address: string
+  ex_marriage_date: string
+  ex_divorce_date: string
+  ex_divorce_reason: string
   fam_has_children: boolean
   fam_children: Child[]
-  // Step 7 (previous_us_travel, social_media)
+  // Step 7 (previous_us_travel, social_media, visa_history)
   prev_visited_before: boolean
   prev_last_visit_date: string
   prev_visa_refused: boolean
@@ -91,6 +149,26 @@ type FormData = {
   prev_cancel_reason: string
   prev_overstayed: boolean
   prev_visit_dates: VisitDate[]
+  had_us_visa: boolean
+  us_visa_number: string
+  us_visa_type: string
+  us_visa_issue_date: string
+  us_visa_expiry_date: string
+  us_visa_fingerprints: boolean
+  us_visa_lost: boolean
+  us_visa_lost_when: string
+  us_driver_license: boolean
+  us_driver_license_number: string
+  us_driver_license_state: string
+  us_contact_name: string
+  us_contact_address: string
+  us_contact_phone: string
+  us_contact_email: string
+  us_contact_relationship: string
+  military_served: boolean
+  military_country: string
+  military_rank: string
+  military_period: string
   social_platforms: SocialPlatform[]
   // Step 8 (security_questions)
   sec_q1: boolean | null
@@ -109,25 +187,78 @@ type FormData = {
   sec_q7_details: string
   sec_q8: boolean | null
   sec_q8_details: string
+  sec_q9: boolean | null
+  sec_q9_details: string
+  sec_q10: boolean | null
+  sec_q10_details: string
+  sec_q11: boolean | null
+  sec_q11_details: string
+  sec_q12: boolean | null
+  sec_q12_details: string
+  sec_q13: boolean | null
+  sec_q13_details: string
+  sec_q14: boolean | null
+  sec_q14_details: string
+  sec_q15: boolean | null
+  sec_q15_details: string
+  sec_q16: boolean | null
+  sec_q16_details: string
+  form_agreed: boolean
 }
 
 const defaultFormData: FormData = {
+  // Step 1
   surname: '', given_name: '', other_names: '', gender: '', marital_status: '',
   birth_date: '', birth_city: '', birth_state: '', birth_country: '',
+  nationality: 'Brasileira', cpf: '', rg: '',
+  has_other_nationality: false, other_nationality_country: '', other_nationality_passport: '',
+  ssn: '', us_tax_id: '', other_languages: '',
+  // Step 2
   address_street: '', address_number: '', address_complement: '', address_neighborhood: '',
-  address_city: '', address_state: '', address_zip: '', phone_residential: '', phone_mobile: '', email: '',
-  passport_type: '', passport_number: '', passport_country: 'Brasil', passport_issue_date: '', passport_expiry_date: '',
-  travel_purpose: '', intended_arrival_date: '', intended_stay_duration: '', us_address: '', trip_payer: '',
+  address_city: '', address_state: '', address_zip: '',
+  phone_residential: '', phone_mobile: '', phone_commercial: '', email: '',
+  visa_delivery_same_address: true, visa_delivery_other_address: '',
+  // Step 3
+  passport_type: '', passport_number: '', passport_country: 'Brasil',
+  passport_issue_date: '', passport_expiry_date: '',
+  passport_issue_city_state: '', passport_lost: false, passport_lost_info: '',
+  // Step 4
+  travel_purpose: '', intended_arrival_date: '', intended_stay_duration: '',
+  us_address: '', trip_city: '', trip_hotel: '', trip_payer: '',
+  trip_payer_name: '', trip_payer_address: '', trip_payer_phone: '', trip_payer_email: '', trip_payer_relationship: '',
+  intl_travel: '', travel_companions: [], travel_group_agency: '',
+  // Step 5
   emp_employer: '', emp_job_title: '', emp_salary: '', emp_employed_since: '', emp_employer_address: '',
+  emp_employer_city_state: '', emp_employer_phone: '', emp_employer_zip: '', emp_supervisor: '',
   emp_currently_employed: true,
+  emp_prev_employer: '', emp_prev_address: '', emp_prev_city_state: '', emp_prev_phone: '',
+  emp_prev_zip: '', emp_prev_job_title: '', emp_prev_supervisor: '', emp_prev_start_date: '', emp_prev_end_date: '',
   edu_last_school: '', edu_field_of_study: '', edu_graduation_year: '', edu_education_level: '',
+  edu_schools: [],
+  // Step 6
   fam_father_name: '', fam_father_birthdate: '', fam_father_birthplace: '', fam_father_nationality: 'Brasileira',
+  fam_father_in_usa: false, fam_father_usa_status: '',
   fam_mother_name: '', fam_mother_birthdate: '', fam_mother_birthplace: '', fam_mother_nationality: 'Brasileira',
+  fam_mother_in_usa: false, fam_mother_usa_status: '',
+  rel_in_usa_name: '', rel_in_usa_relationship: '', rel_in_usa_status: '',
   fam_has_spouse: false, fam_spouse_name: '',
+  fam_spouse_birthdate: '', fam_spouse_nationality: '', fam_spouse_birth_city: '',
+  fam_divorced: false,
+  ex_spouse_name: '', ex_spouse_birthdate: '', ex_spouse_address: '',
+  ex_marriage_date: '', ex_divorce_date: '', ex_divorce_reason: '',
   fam_has_children: false, fam_children: [],
-  prev_visited_before: false, prev_last_visit_date: '', prev_visa_refused: false, prev_refused_reason: '',
-  prev_visa_cancelled: false, prev_cancel_reason: '', prev_overstayed: false, prev_visit_dates: [],
+  // Step 7
+  prev_visited_before: false, prev_last_visit_date: '',
+  prev_visa_refused: false, prev_refused_reason: '',
+  prev_visa_cancelled: false, prev_cancel_reason: '',
+  prev_overstayed: false, prev_visit_dates: [],
+  had_us_visa: false, us_visa_number: '', us_visa_type: '', us_visa_issue_date: '', us_visa_expiry_date: '',
+  us_visa_fingerprints: false, us_visa_lost: false, us_visa_lost_when: '',
+  us_driver_license: false, us_driver_license_number: '', us_driver_license_state: '',
+  us_contact_name: '', us_contact_address: '', us_contact_phone: '', us_contact_email: '', us_contact_relationship: '',
+  military_served: false, military_country: '', military_rank: '', military_period: '',
   social_platforms: [],
+  // Step 8
   sec_q1: null, sec_q1_details: '',
   sec_q2: null, sec_q2_details: '',
   sec_q3: null, sec_q3_details: '',
@@ -136,6 +267,15 @@ const defaultFormData: FormData = {
   sec_q6: null, sec_q6_details: '',
   sec_q7: null, sec_q7_details: '',
   sec_q8: null, sec_q8_details: '',
+  sec_q9: null, sec_q9_details: '',
+  sec_q10: null, sec_q10_details: '',
+  sec_q11: null, sec_q11_details: '',
+  sec_q12: null, sec_q12_details: '',
+  sec_q13: null, sec_q13_details: '',
+  sec_q14: null, sec_q14_details: '',
+  sec_q15: null, sec_q15_details: '',
+  sec_q16: null, sec_q16_details: '',
+  form_agreed: false,
 }
 
 function inputClass() {
