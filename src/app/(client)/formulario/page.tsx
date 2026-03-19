@@ -1354,30 +1354,50 @@ export default function FormularioPage() {
                           className={inputClass()}
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Supervisor direto</label>
+                        <input type="text" value={formData.emp_supervisor} onChange={(e) => updateField('emp_supervisor', e.target.value)} className={inputClass()} placeholder="Nome do supervisor" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Telefone do empregador</label>
+                        <input type="tel" value={formData.emp_employer_phone} onChange={(e) => updateField('emp_employer_phone', e.target.value)} className={inputClass()} placeholder="(11) 3000-0000" />
+                      </div>
                       <div className="col-span-2">
                         <label className="block text-sm font-semibold text-slate-700 mb-2">Endereço do empregador</label>
-                        <input
-                          type="text"
-                          value={formData.emp_employer_address}
-                          onChange={(e) => updateField('emp_employer_address', e.target.value)}
-                          className={inputClass()}
-                          placeholder="Rua, número, cidade, estado"
-                        />
+                        <input type="text" value={formData.emp_employer_address} onChange={(e) => updateField('emp_employer_address', e.target.value)} className={inputClass()} placeholder="Rua, número" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">Cidade/Estado</label>
+                        <input type="text" value={formData.emp_employer_city_state} onChange={(e) => updateField('emp_employer_city_state', e.target.value)} className={inputClass()} placeholder="São Paulo, SP" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-2">CEP</label>
+                        <input type="text" value={formData.emp_employer_zip} onChange={(e) => updateField('emp_employer_zip', e.target.value)} className={inputClass()} placeholder="01310-100" />
                       </div>
                     </div>
                   )}
+                  <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <p className="text-sm font-semibold text-slate-700 mb-3">Empregador anterior (preencha se trabalha há menos de 5 anos no atual)</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Empresa</label><input type="text" value={formData.emp_prev_employer} onChange={(e) => updateField('emp_prev_employer', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Cargo</label><input type="text" value={formData.emp_prev_job_title} onChange={(e) => updateField('emp_prev_job_title', e.target.value)} className={inputClass()} /></div>
+                      <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Endereço</label><input type="text" value={formData.emp_prev_address} onChange={(e) => updateField('emp_prev_address', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Cidade/Estado</label><input type="text" value={formData.emp_prev_city_state} onChange={(e) => updateField('emp_prev_city_state', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Telefone</label><input type="tel" value={formData.emp_prev_phone} onChange={(e) => updateField('emp_prev_phone', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">CEP</label><input type="text" value={formData.emp_prev_zip} onChange={(e) => updateField('emp_prev_zip', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Supervisor</label><input type="text" value={formData.emp_prev_supervisor} onChange={(e) => updateField('emp_prev_supervisor', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data início</label><input type="date" value={formData.emp_prev_start_date} onChange={(e) => updateField('emp_prev_start_date', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data fim</label><input type="date" value={formData.emp_prev_end_date} onChange={(e) => updateField('emp_prev_end_date', e.target.value)} className={inputClass()} /></div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="border-t border-slate-100 pt-6">
                   <h3 className="text-base font-bold text-slate-900 mb-4">Educação</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="col-span-2">
                       <label className="block text-sm font-semibold text-slate-700 mb-2">Nível de escolaridade</label>
-                      <select
-                        value={formData.edu_education_level}
-                        onChange={(e) => updateField('edu_education_level', e.target.value)}
-                        className={inputClass()}
-                      >
+                      <select value={formData.edu_education_level} onChange={(e) => updateField('edu_education_level', e.target.value)} className={inputClass()}>
                         <option value="">Selecione</option>
                         <option value="ensino_medio">Ensino Médio</option>
                         <option value="graduacao">Graduação</option>
@@ -1386,36 +1406,27 @@ export default function FormularioPage() {
                         <option value="doutorado">Doutorado</option>
                       </select>
                     </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Última escola/universidade</label>
-                      <input
-                        type="text"
-                        value={formData.edu_last_school}
-                        onChange={(e) => updateField('edu_last_school', e.target.value)}
-                        className={inputClass()}
-                        placeholder="Nome da instituição"
-                      />
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Curso / Área de estudo</label>
-                      <input
-                        type="text"
-                        value={formData.edu_field_of_study}
-                        onChange={(e) => updateField('edu_field_of_study', e.target.value)}
-                        className={inputClass()}
-                        placeholder="Engenharia de Computação"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Ano de conclusão</label>
-                      <input
-                        type="text"
-                        value={formData.edu_graduation_year}
-                        onChange={(e) => updateField('edu_graduation_year', e.target.value)}
-                        className={inputClass()}
-                        placeholder="2015"
-                      />
-                    </div>
+                    <div><label className="block text-sm font-semibold text-slate-700 mb-2">Última escola/universidade</label><input type="text" value={formData.edu_last_school} onChange={(e) => updateField('edu_last_school', e.target.value)} className={inputClass()} placeholder="Nome da instituição" /></div>
+                    <div><label className="block text-sm font-semibold text-slate-700 mb-2">Curso / Área</label><input type="text" value={formData.edu_field_of_study} onChange={(e) => updateField('edu_field_of_study', e.target.value)} className={inputClass()} placeholder="Engenharia de Computação" /></div>
+                    <div><label className="block text-sm font-semibold text-slate-700 mb-2">Ano de conclusão</label><input type="text" value={formData.edu_graduation_year} onChange={(e) => updateField('edu_graduation_year', e.target.value)} className={inputClass()} placeholder="2015" /></div>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700 mb-2">Histórico escolar adicional (até 3 instituições)</p>
+                  <div className="space-y-3">
+                    {formData.edu_schools.map((s, idx) => (
+                      <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-2 gap-3">
+                        <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Nome da instituição</label><input type="text" value={s.name} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], name: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} /></div>
+                        <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Endereço</label><input type="text" value={s.address} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], address: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} /></div>
+                        <div><label className="block text-xs font-semibold text-slate-600 mb-1">Cidade/Estado</label><input type="text" value={s.city_state} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], city_state: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} /></div>
+                        <div><label className="block text-xs font-semibold text-slate-600 mb-1">CEP</label><input type="text" value={s.zip} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], zip: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} /></div>
+                        <div><label className="block text-xs font-semibold text-slate-600 mb-1">Curso</label><input type="text" value={s.course} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], course: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} /></div>
+                        <div><label className="block text-xs font-semibold text-slate-600 mb-1">Início (mm/aaaa)</label><input type="text" value={s.start_month_year} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], start_month_year: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} placeholder="03/2010" /></div>
+                        <div><label className="block text-xs font-semibold text-slate-600 mb-1">Conclusão (mm/aaaa)</label><input type="text" value={s.end_month_year} onChange={(e) => { const u = [...formData.edu_schools]; u[idx] = { ...u[idx], end_month_year: e.target.value }; updateField('edu_schools', u) }} className={inputClass()} placeholder="12/2014" /></div>
+                        <div className="col-span-2 flex justify-end"><button type="button" onClick={() => updateField('edu_schools', formData.edu_schools.filter((_, i) => i !== idx))} className="text-xs text-red-600 font-semibold hover:text-red-800">Remover</button></div>
+                      </div>
+                    ))}
+                    {formData.edu_schools.length < 3 && (
+                      <button type="button" onClick={() => updateField('edu_schools', [...formData.edu_schools, { name: '', address: '', city_state: '', zip: '', course: '', start_month_year: '', end_month_year: '' }])} className="text-sm text-blue-700 font-semibold hover:underline">+ Adicionar instituição</button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1445,6 +1456,18 @@ export default function FormularioPage() {
                       <label className="block text-sm font-semibold text-slate-700 mb-2">Nacionalidade</label>
                       <input type="text" value={formData.fam_father_nationality} onChange={(e) => updateField('fam_father_nationality', e.target.value)} className={inputClass()} placeholder="Brasileira" />
                     </div>
+                    <div className="col-span-2">
+                      <label className="flex items-center gap-3 cursor-pointer mb-2">
+                        <input type="checkbox" checked={formData.fam_father_in_usa} onChange={(e) => updateField('fam_father_in_usa', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                        <span className="text-sm font-semibold text-slate-700">Pai está nos EUA</span>
+                      </label>
+                      {formData.fam_father_in_usa && (
+                        <div className="pl-7">
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Status nos EUA (ex: Cidadão, Residente permanente)</label>
+                          <input type="text" value={formData.fam_father_usa_status} onChange={(e) => updateField('fam_father_usa_status', e.target.value)} className={inputClass()} placeholder="Cidadão americano" />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -1455,41 +1478,60 @@ export default function FormularioPage() {
                       <label className="block text-sm font-semibold text-slate-700 mb-2">Nome completo da mãe</label>
                       <input type="text" value={formData.fam_mother_name} onChange={(e) => updateField('fam_mother_name', e.target.value)} className={inputClass()} placeholder="Nome da mãe" />
                     </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Data de nascimento</label>
-                      <input type="date" value={formData.fam_mother_birthdate} onChange={(e) => updateField('fam_mother_birthdate', e.target.value)} className={inputClass()} />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Local de nascimento</label>
-                      <input type="text" value={formData.fam_mother_birthplace} onChange={(e) => updateField('fam_mother_birthplace', e.target.value)} className={inputClass()} placeholder="Cidade, País" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Nacionalidade</label>
-                      <input type="text" value={formData.fam_mother_nationality} onChange={(e) => updateField('fam_mother_nationality', e.target.value)} className={inputClass()} placeholder="Brasileira" />
+                    <div><label className="block text-sm font-semibold text-slate-700 mb-2">Data de nascimento</label><input type="date" value={formData.fam_mother_birthdate} onChange={(e) => updateField('fam_mother_birthdate', e.target.value)} className={inputClass()} /></div>
+                    <div><label className="block text-sm font-semibold text-slate-700 mb-2">Local de nascimento</label><input type="text" value={formData.fam_mother_birthplace} onChange={(e) => updateField('fam_mother_birthplace', e.target.value)} className={inputClass()} placeholder="Cidade, País" /></div>
+                    <div><label className="block text-sm font-semibold text-slate-700 mb-2">Nacionalidade</label><input type="text" value={formData.fam_mother_nationality} onChange={(e) => updateField('fam_mother_nationality', e.target.value)} className={inputClass()} placeholder="Brasileira" /></div>
+                    <div className="col-span-2">
+                      <label className="flex items-center gap-3 cursor-pointer mb-2">
+                        <input type="checkbox" checked={formData.fam_mother_in_usa} onChange={(e) => updateField('fam_mother_in_usa', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                        <span className="text-sm font-semibold text-slate-700">Mãe está nos EUA</span>
+                      </label>
+                      {formData.fam_mother_in_usa && (
+                        <div className="pl-7">
+                          <label className="block text-xs font-semibold text-slate-600 mb-1">Status nos EUA</label>
+                          <input type="text" value={formData.fam_mother_usa_status} onChange={(e) => updateField('fam_mother_usa_status', e.target.value)} className={inputClass()} placeholder="Cidadã americana" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="border-t border-slate-100 pt-6">
+                  <h3 className="text-base font-semibold text-slate-800 mb-3">Parente direto nos EUA (irmão, filho, etc.)</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="block text-xs font-semibold text-slate-600 mb-1">Nome</label><input type="text" value={formData.rel_in_usa_name} onChange={(e) => updateField('rel_in_usa_name', e.target.value)} className={inputClass()} placeholder="Nome completo" /></div>
+                    <div><label className="block text-xs font-semibold text-slate-600 mb-1">Parentesco</label><input type="text" value={formData.rel_in_usa_relationship} onChange={(e) => updateField('rel_in_usa_relationship', e.target.value)} className={inputClass()} placeholder="Irmão, filho..." /></div>
+                    <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Status nos EUA</label><input type="text" value={formData.rel_in_usa_status} onChange={(e) => updateField('rel_in_usa_status', e.target.value)} className={inputClass()} placeholder="Cidadão, Residente permanente..." /></div>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-6">
                   <label className="flex items-center gap-3 cursor-pointer mb-4">
-                    <input
-                      type="checkbox"
-                      checked={formData.fam_has_spouse}
-                      onChange={(e) => updateField('fam_has_spouse', e.target.checked)}
-                      className="accent-blue-700 w-4 h-4"
-                    />
+                    <input type="checkbox" checked={formData.fam_has_spouse} onChange={(e) => updateField('fam_has_spouse', e.target.checked)} className="accent-blue-700 w-4 h-4" />
                     <span className="text-base font-semibold text-slate-800">Tenho cônjuge / companheiro(a)</span>
                   </label>
                   {formData.fam_has_spouse && (
-                    <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">Nome completo do cônjuge</label>
-                      <input
-                        type="text"
-                        value={formData.fam_spouse_name}
-                        onChange={(e) => updateField('fam_spouse_name', e.target.value)}
-                        className={inputClass()}
-                        placeholder="Nome completo"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Nome completo</label><input type="text" value={formData.fam_spouse_name} onChange={(e) => updateField('fam_spouse_name', e.target.value)} className={inputClass()} placeholder="Nome completo" /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data de nascimento</label><input type="date" value={formData.fam_spouse_birthdate} onChange={(e) => updateField('fam_spouse_birthdate', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Nacionalidade</label><input type="text" value={formData.fam_spouse_nationality} onChange={(e) => updateField('fam_spouse_nationality', e.target.value)} className={inputClass()} placeholder="Brasileira" /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Cidade de nascimento</label><input type="text" value={formData.fam_spouse_birth_city} onChange={(e) => updateField('fam_spouse_birth_city', e.target.value)} className={inputClass()} placeholder="São Paulo" /></div>
+                    </div>
+                  )}
+                </div>
+                <div className="border-t border-slate-100 pt-4">
+                  <label className="flex items-center gap-3 cursor-pointer mb-3">
+                    <input type="checkbox" checked={formData.fam_divorced} onChange={(e) => updateField('fam_divorced', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                    <span className="text-sm font-semibold text-slate-800">Já fui divorciado(a)</span>
+                  </label>
+                  {formData.fam_divorced && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Nome do ex-cônjuge</label><input type="text" value={formData.ex_spouse_name} onChange={(e) => updateField('ex_spouse_name', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data de nascimento</label><input type="date" value={formData.ex_spouse_birthdate} onChange={(e) => updateField('ex_spouse_birthdate', e.target.value)} className={inputClass()} /></div>
+                      <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Endereço</label><input type="text" value={formData.ex_spouse_address} onChange={(e) => updateField('ex_spouse_address', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data do casamento</label><input type="date" value={formData.ex_marriage_date} onChange={(e) => updateField('ex_marriage_date', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data do divórcio</label><input type="date" value={formData.ex_divorce_date} onChange={(e) => updateField('ex_divorce_date', e.target.value)} className={inputClass()} /></div>
+                      <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Motivo do divórcio</label><input type="text" value={formData.ex_divorce_reason} onChange={(e) => updateField('ex_divorce_reason', e.target.value)} className={inputClass()} placeholder="Acordo mútuo, etc." /></div>
                     </div>
                   )}
                 </div>
@@ -1705,14 +1747,78 @@ export default function FormularioPage() {
                   )}
 
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.prev_overstayed}
-                      onChange={(e) => updateField('prev_overstayed', e.target.checked)}
-                      className="accent-blue-700 w-4 h-4"
-                    />
+                    <input type="checkbox" checked={formData.prev_overstayed} onChange={(e) => updateField('prev_overstayed', e.target.checked)} className="accent-blue-700 w-4 h-4" />
                     <span className="font-semibold text-slate-800">Já permaneci nos EUA além do prazo autorizado</span>
                   </label>
+                </div>
+
+                <div className="border-t border-slate-100 pt-6 space-y-4">
+                  <h3 className="text-base font-semibold text-slate-800">Visto americano anterior</h3>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" checked={formData.had_us_visa} onChange={(e) => updateField('had_us_visa', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                    <span className="text-sm font-semibold text-slate-700">Já tive visto americano</span>
+                  </label>
+                  {formData.had_us_visa && (
+                    <div className="grid grid-cols-2 gap-3 pl-7">
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Número do visto</label><input type="text" value={formData.us_visa_number} onChange={(e) => updateField('us_visa_number', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Tipo (B1/B2, F1...)</label><input type="text" value={formData.us_visa_type} onChange={(e) => updateField('us_visa_type', e.target.value)} className={inputClass()} placeholder="B1/B2" /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data de emissão</label><input type="date" value={formData.us_visa_issue_date} onChange={(e) => updateField('us_visa_issue_date', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Data de validade</label><input type="date" value={formData.us_visa_expiry_date} onChange={(e) => updateField('us_visa_expiry_date', e.target.value)} className={inputClass()} /></div>
+                    </div>
+                  )}
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" checked={formData.us_visa_fingerprints} onChange={(e) => updateField('us_visa_fingerprints', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                    <span className="text-sm font-semibold text-slate-700">Já coletei digitais dos 10 dedos para visto americano</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" checked={formData.us_visa_lost} onChange={(e) => updateField('us_visa_lost', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                    <span className="text-sm font-semibold text-slate-700">Já tive visto americano perdido ou roubado</span>
+                  </label>
+                  {formData.us_visa_lost && (
+                    <div className="pl-7">
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Quando ocorreu?</label>
+                      <input type="text" value={formData.us_visa_lost_when} onChange={(e) => updateField('us_visa_lost_when', e.target.value)} className={inputClass()} placeholder="Mês/Ano e circunstâncias" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-slate-100 pt-6 space-y-3">
+                  <h3 className="text-base font-semibold text-slate-800">Carteira de motorista nos EUA</h3>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" checked={formData.us_driver_license} onChange={(e) => updateField('us_driver_license', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                    <span className="text-sm font-semibold text-slate-700">Possuo ou já possuí carteira de motorista americana</span>
+                  </label>
+                  {formData.us_driver_license && (
+                    <div className="grid grid-cols-2 gap-3 pl-7">
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Número</label><input type="text" value={formData.us_driver_license_number} onChange={(e) => updateField('us_driver_license_number', e.target.value)} className={inputClass()} /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Estado emissor</label><input type="text" value={formData.us_driver_license_state} onChange={(e) => updateField('us_driver_license_state', e.target.value)} className={inputClass()} placeholder="FL, NY..." /></div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-slate-100 pt-6">
+                  <h3 className="text-base font-semibold text-slate-800 mb-3">Contato nos EUA</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="block text-xs font-semibold text-slate-600 mb-1">Nome</label><input type="text" value={formData.us_contact_name} onChange={(e) => updateField('us_contact_name', e.target.value)} className={inputClass()} placeholder="Nome completo" /></div>
+                    <div><label className="block text-xs font-semibold text-slate-600 mb-1">Relação</label><input type="text" value={formData.us_contact_relationship} onChange={(e) => updateField('us_contact_relationship', e.target.value)} className={inputClass()} placeholder="Amigo, familiar..." /></div>
+                    <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Endereço</label><input type="text" value={formData.us_contact_address} onChange={(e) => updateField('us_contact_address', e.target.value)} className={inputClass()} /></div>
+                    <div><label className="block text-xs font-semibold text-slate-600 mb-1">Telefone</label><input type="tel" value={formData.us_contact_phone} onChange={(e) => updateField('us_contact_phone', e.target.value)} className={inputClass()} /></div>
+                    <div><label className="block text-xs font-semibold text-slate-600 mb-1">E-mail</label><input type="email" value={formData.us_contact_email} onChange={(e) => updateField('us_contact_email', e.target.value)} className={inputClass()} /></div>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-6 space-y-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" checked={formData.military_served} onChange={(e) => updateField('military_served', e.target.checked)} className="accent-blue-700 w-4 h-4" />
+                    <span className="text-sm font-semibold text-slate-800">Já servi nas forças armadas</span>
+                  </label>
+                  {formData.military_served && (
+                    <div className="grid grid-cols-2 gap-3 pl-7">
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">País</label><input type="text" value={formData.military_country} onChange={(e) => updateField('military_country', e.target.value)} className={inputClass()} placeholder="Brasil" /></div>
+                      <div><label className="block text-xs font-semibold text-slate-600 mb-1">Patente/Função</label><input type="text" value={formData.military_rank} onChange={(e) => updateField('military_rank', e.target.value)} className={inputClass()} placeholder="Soldado" /></div>
+                      <div className="col-span-2"><label className="block text-xs font-semibold text-slate-600 mb-1">Período (de/até)</label><input type="text" value={formData.military_period} onChange={(e) => updateField('military_period', e.target.value)} className={inputClass()} placeholder="Jan/2010 a Dez/2011" /></div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-slate-100 pt-6">
@@ -1796,7 +1902,15 @@ export default function FormularioPage() {
                   { key: 'sec_q5' as const, detailKey: 'sec_q5_details' as const, question: 'Já foi deportado ou removido dos Estados Unidos?' },
                   { key: 'sec_q6' as const, detailKey: 'sec_q6_details' as const, question: 'Já teve um visto americano negado ou entrada recusada nos EUA?' },
                   { key: 'sec_q7' as const, detailKey: 'sec_q7_details' as const, question: 'Já procurou obter ou ajudou outros a obter visto de forma fraudulenta?' },
-                  { key: 'sec_q8' as const, detailKey: 'sec_q8_details' as const, question: 'É portador de doença contagiosa ou tem transtorno mental que possa representar risco?' },
+                  { key: 'sec_q8' as const, detailKey: 'sec_q8_details' as const, question: 'É portador de doença contagiosa (ex: tuberculose) ou transtorno mental que possa representar risco?' },
+                  { key: 'sec_q9' as const, detailKey: 'sec_q9_details' as const, question: 'Tem ou já teve transtorno físico ou mental que possa causar dano a si mesmo ou a terceiros?' },
+                  { key: 'sec_q10' as const, detailKey: 'sec_q10_details' as const, question: 'Foi viciado ou dependente de substâncias entorpecentes (além do já informado)?' },
+                  { key: 'sec_q11' as const, detailKey: 'sec_q11_details' as const, question: 'Pretende viajar para exercer prostituição ou exploração sexual?' },
+                  { key: 'sec_q12' as const, detailKey: 'sec_q12_details' as const, question: 'Já esteve envolvido em lavagem de dinheiro?' },
+                  { key: 'sec_q13' as const, detailKey: 'sec_q13_details' as const, question: 'Já se envolveu em espionagem, sabotagem ou atividades ilegais contra qualquer país?' },
+                  { key: 'sec_q14' as const, detailKey: 'sec_q14_details' as const, question: 'Já participou, apoiou ou planejou atos de terrorismo ou genocídio?' },
+                  { key: 'sec_q15' as const, detailKey: 'sec_q15_details' as const, question: 'Já cometeu ou conspirou para cometer tortura ou homicídio extrajudicial?' },
+                  { key: 'sec_q16' as const, detailKey: 'sec_q16_details' as const, question: 'Já votou nos EUA ou renunciou à cidadania americana para evitar tributação?' },
                 ].map(({ key, detailKey, question }, idx) => (
                   <div key={key} className="p-5 bg-slate-50 rounded-xl border border-slate-200">
                     <p className="text-sm font-semibold text-slate-800 mb-3">
@@ -1838,8 +1952,18 @@ export default function FormularioPage() {
                   </div>
                 ))}
 
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
-                  <strong>Atenção:</strong> Ao prosseguir, você declara que todas as informações fornecidas neste formulário são verdadeiras e corretas.
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.form_agreed}
+                      onChange={(e) => updateField('form_agreed', e.target.checked)}
+                      className="accent-blue-700 w-4 h-4 mt-0.5 flex-shrink-0"
+                    />
+                    <span className="text-sm text-amber-800">
+                      <strong>Declaração de veracidade:</strong> Declaro que todas as informações fornecidas neste formulário são verdadeiras, completas e corretas. Estou ciente de que informações falsas podem resultar em negação permanente do visto e consequências legais.
+                    </span>
+                  </label>
                 </div>
               </div>
             )}
