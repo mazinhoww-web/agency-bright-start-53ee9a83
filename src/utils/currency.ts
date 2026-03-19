@@ -19,7 +19,7 @@ export function calculateConsularFee(params: {
   applicants: number
 }) {
   const { usdAmount, usdRate, paymentMethod, applicants } = params
-  const markup = paymentMethod === 'card' ? 1.10 : 1.15
+  const markup = 1.10 // mesma taxa independente do método de pagamento
   const perApplicantBrl = usdAmount * usdRate * markup
   const totalBrl = perApplicantBrl * applicants
 

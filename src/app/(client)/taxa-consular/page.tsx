@@ -263,7 +263,7 @@ export default function TaxaConsularPage() {
             <div>
               <p className="font-semibold text-amber-800 mb-1">Sobre a taxa MRV</p>
               <p className="text-sm text-amber-700">
-                A taxa de US$ 185 por pessoa é cobrada diretamente pelo governo americano e é obrigatória para todos os solicitantes de visto B1/B2. O câmbio inclui um spread para cobrir variações cambiais.
+                A taxa de US$ 185 por pessoa é cobrada diretamente pelo governo americano e é obrigatória para todos os solicitantes de visto B1/B2. O valor em reais é calculado com base na cotação atual do dólar.
               </p>
             </div>
           </div>
@@ -273,7 +273,7 @@ export default function TaxaConsularPage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-6">
           <h2 className="font-bold text-slate-900 mb-6">Cálculo da taxa</h2>
 
-          <div className="grid grid-cols-3 gap-4 mb-6 text-center">
+          <div className="grid grid-cols-2 gap-4 mb-6 text-center">
             <div className="bg-slate-50 rounded-xl p-4">
               <p className="text-xs text-slate-500 mb-1">Taxa por pessoa</p>
               <p className="text-xl font-bold text-slate-900">US$ {USD_AMOUNT}</p>
@@ -281,14 +281,6 @@ export default function TaxaConsularPage() {
             <div className="bg-slate-50 rounded-xl p-4">
               <p className="text-xs text-slate-500 mb-1">Solicitantes</p>
               <p className="text-xl font-bold text-slate-900">{applicantsCount}</p>
-            </div>
-            <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-xs text-slate-500 mb-1">Cotação USD/BRL</p>
-              {loadingRate ? (
-                <div className="h-7 bg-slate-200 rounded animate-pulse" />
-              ) : (
-                <p className="text-xl font-bold text-slate-900">R$ {usdRate?.toFixed(2)}</p>
-              )}
             </div>
           </div>
 
@@ -300,7 +292,7 @@ export default function TaxaConsularPage() {
                 {
                   id: 'pix' as const,
                   label: 'PIX',
-                  markup: '+ 15%',
+                  description: 'Aprovação imediata',
                   icon: (
                     <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -309,8 +301,8 @@ export default function TaxaConsularPage() {
                 },
                 {
                   id: 'card' as const,
-                  label: 'Cartão',
-                  markup: '+ 10%',
+                  label: 'Cartão de crédito',
+                  description: 'Visa, Mastercard, Elo',
                   icon: (
                     <svg className="w-5 h-5 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -337,7 +329,7 @@ export default function TaxaConsularPage() {
                   {m.icon}
                   <div>
                     <p className="font-semibold text-sm text-slate-900">{m.label}</p>
-                    <p className="text-xs text-slate-500">Spread {m.markup}</p>
+                    <p className="text-xs text-slate-500">{m.description}</p>
                   </div>
                 </label>
               ))}
@@ -348,13 +340,15 @@ export default function TaxaConsularPage() {
           {fee && (
             <div className="bg-blue-50 rounded-xl p-5 mb-6">
               <div className="flex justify-between items-center mb-3">
-                <span className="text-slate-700">Por pessoa ({paymentMethod === 'pix' ? 'PIX' : 'Cartão'})</span>
+                <span className="text-slate-700">Por solicitante</span>
                 <span className="font-semibold text-slate-900">{fee.perApplicantFormatted}</span>
               </div>
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-slate-700">× {applicantsCount} solicitantes</span>
-                <span className="font-semibold text-slate-900">{applicantsCount}x</span>
-              </div>
+              {applicantsCount > 1 && (
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-slate-700">× {applicantsCount} solicitantes</span>
+                  <span className="font-semibold text-slate-900">{applicantsCount}x</span>
+                </div>
+              )}
               <div className="border-t border-blue-200 pt-3 flex justify-between items-center">
                 <span className="font-bold text-blue-900 text-lg">Total</span>
                 <span className="font-bold text-blue-900 text-2xl">{fee.totalFormatted}</span>

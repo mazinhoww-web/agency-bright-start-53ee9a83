@@ -75,9 +75,27 @@ async function processQueue(): Promise<NextResponse> {
           continue
         }
 
-        const vagas = Math.floor(Math.random() * 3) + 2 // 2-4 vagas (dynamic urgency)
+        // Buscar vagas reais disponíveis
+        const { count: vagasCount } = await supabaseAdmin
+          .from('available_dates')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_available', true)
+          .gte('date', new Date().toISOString().split('T')[0])
+
+        const vagas = vagasCount ?? 3
+
         const deadlineDate = new Date(Date.now() + 48 * 3600 * 1000).toLocaleDateString('pt-BR')
-        const couponCode = `VISTO${Math.floor(Math.random() * 900) + 100}`
+
+        // Buscar cupom ativo real
+        const { data: couponRow } = await supabaseAdmin
+          .from('coupons')
+          .select('code')
+          .eq('is_active', true)
+          .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
+          .limit(1)
+          .maybeSingle()
+
+        const couponCode = (couponRow as { code: string } | null)?.code ?? ''
 
         const allVars = {
           ...commonVars(),
